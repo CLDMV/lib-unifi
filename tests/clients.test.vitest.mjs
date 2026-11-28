@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:07-08:00 (1795870567)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -186,6 +186,52 @@ describe("clients.fixed.ip.set", () => {
 		});
 		await expect(unifi.clients.fixed.ip.set("not-a-mac", "192.0.2.10")).rejects.toMatchObject({ code: "VALIDATION_MAC" });
 		await expect(unifi.clients.fixed.ip.set("00:00:5e:00:53:01", "999.1.1.1")).rejects.toMatchObject({ code: "VALIDATION_IP" });
+		await unifi.slothlet.shutdown();
+	});
+});
+
+describe("clients.list with both API paths available", () => {
+	test("the official clients are enriched from the legacy records (fixed IP + network name)", async () => {
+		const fetch = mockFetch([...officialRoutes(), ...legacyRoutes()]);
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { apiKey: "doc-api-key", legacy: { username: "digby", password: "doc-password" } }
+		});
+		const clients = await unifi.clients.list({ active: true });
+		const printer = clients.find((client) => client.mac === "00:00:5e:00:53:01");
+		expect(printer).toMatchObject({
+			mac: "00:00:5e:00:53:01",
+			fixed: "192.0.2.10",
+			network: "Default",
+			active: true
+		});
+		// A client with no legacy record keeps the official shape (networkId).
+		const thermostat = clients.find((client) => client.mac === "00:00:5e:00:53:02");
+		expect(thermostat).toMatchObject({ network: "66666666-7777-4888-8999-000000000000", fixed: false });
+		await unifi.slothlet.shutdown();
+	});
+
+	test("active:false merges the offline clients from the legacy records", async () => {
+		const fetch = mockFetch([...officialRoutes(), ...legacyRoutes()]);
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { apiKey: "doc-api-key", legacy: { username: "digby", password: "doc-password" } }
+		});
+		const macs = (await unifi.clients.list({ active: false })).map((client) => client.mac);
+		expect(macs).toEqual(expect.arrayContaining(["00:00:5e:00:53:01", "00:00:5e:00:53:02", "00:00:5e:00:53:03"]));
+		await unifi.slothlet.shutdown();
+	});
+
+	test("active:false still refuses on an official-only deployment (and before any client fetch)", async () => {
+		const fetch = mockFetch(officialRoutes());
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "doc-api-key" } });
+		await expect(unifi.clients.list({ active: false })).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE" });
+		// Nothing beyond the probe was sent: the check runs before the read (the
+		// probe's single clients call carries offset=0&limit=1).
+		const clientsCalls = fetch.calls.filter((call) => call.pathname.endsWith("/clients"));
+		expect(clientsCalls.every((call) => call.url.includes("limit=1"))).toBe(true);
 		await unifi.slothlet.shutdown();
 	});
 });

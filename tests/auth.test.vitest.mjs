@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:07-08:00 (1795870567)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -48,9 +48,28 @@ describe("legacy login", () => {
 		const fallback = fetch.calls.find((call) => call.pathname === "/api/login");
 		expect(fallback).toBeTruthy();
 		expect(fallback.headers.Referer).toBe(`${CONTROLLER}:8443/login`);
-		// The legacy session rides subsequent calls.
+		// The legacy session rides subsequent calls — on the ORIGIN the login
+		// succeeded on, port included (the classic controller answers on :8443,
+		// while baseUrl names :443; matching pathname alone would let the reads
+		// silently go to the wrong port).
 		const read = fetch.calls.find((call) => call.pathname === "/api/s/default/rest/networkconf");
 		expect(read.headers.Cookie).toBe("unifises=doc-legacy-cookie");
+		expect(new URL(read.url).host).toBe("192.0.2.1:8443");
+		const sysinfo = fetch.calls.find((call) => call.pathname === "/api/s/default/stat/sysinfo");
+		expect(sysinfo).toBeTruthy();
+		expect(new URL(sysinfo.url).host).toBe("192.0.2.1:8443");
+		for (const call of fetch.calls) {
+			const isLogin = call.pathname === "/api/auth/login" || call.pathname === "/api/login";
+			if (
+				!isLogin &&
+				(call.pathname.startsWith("/api/") ||
+					call.pathname.includes("/rest/") ||
+					call.pathname.includes("/stat/") ||
+					call.pathname.includes("/v2/"))
+			) {
+				expect(new URL(call.url).host, call.url).toBe("192.0.2.1:8443");
+			}
+		}
 		await unifi.slothlet.shutdown();
 	});
 

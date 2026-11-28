@@ -1,0 +1,47 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"id": "b1a2b3c4-d5e6-4f7a-8b9c-1a2b3c4d5e6f",
+	"macAddress": "00:00:5e:00:53:0a",
+	"ipAddress": "192.0.2.11",
+	"model": "U7-Pro",
+	"name": "AP Office",
+	"firmwareVersion": "7.0.68",
+	"state": "ONLINE",
+	"supported": true,
+	"firmwareUpdatable": true,
+	"adoptedAt": "2026-11-01T00:00:00Z",
+	"provisionedAt": "2026-11-01T00:00:00Z",
+	"configurationId": "7596498d2f367dc2",
+	"features": {
+		"accessPoint": null
+	},
+	"interfaces": {
+		"ports": [
+			{
+				"idx": 1,
+				"connector": "RJ45",
+				"speedMbps": 1000,
+				"maxSpeedMbps": 1000,
+				"state": "LINK_UP",
+				"poe": {
+					"enabled": true,
+					"standard": "802.3at",
+					"type": 2,
+					"state": "ACTIVE"
+				}
+			}
+		],
+		"radios": [
+			{
+				"frequencyGHz": 5,
+				"channel": 36,
+				"channelWidthMHz": 40,
+				"wlanStandard": "WiFi6",
+				"txPowerMode": "AUTO"
+			}
+		]
+	},
+	"uplink": {
+		"deviceId": "d3c4d5e6-f7a8-4b9c-0d1e-3c4d5e6f7a8b"
+	}
+}

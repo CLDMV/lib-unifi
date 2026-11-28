@@ -6,19 +6,17 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:11-08:00 (1795866251)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:07-08:00 (1795870567)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
  */
 
 import { context } from "@cldmv/slothlet/runtime";
-import { clearAllSites, getProbeCache, setProbeCache, setSite, getSite } from "./session.mjs";
-import { login } from "./auth/login.mjs";
+import { getProbeCache, setProbeCache } from "./session.mjs";
 import { legacyRequest } from "./transport/request.mjs";
 import { officialInfo, officialRequest, resolveOfficialSiteId } from "./transport/official.mjs";
-import { getSiteData } from "./sites.mjs";
 
 /**
  * @fileoverview The capability probe — the port of unifi-cli's endpoint-type
@@ -46,10 +44,25 @@ import { getSiteData } from "./sites.mjs";
  * 3. **None**: neither surface answered, or no credentials were given.
  */
 
-/** Parses "10.2.105" into a comparable major, or null. */
-function majorOf(version) {
-	const match = /^\s*(\d+)/.exec(String(version ?? ""));
-	return match ? Number(match[1]) : null;
+/**
+ * Parses a controller version into a comparable number the way unifi-cli does
+ * (`parseFloat(version)`): "7.4.187" -> 7.4, "9.0.180" -> 9, null -> NaN. The
+ * major-only parse was a regression — 7.4-7.x are UniFi OS builds and must
+ * classify `unifi_os_v2`.
+ * @param {string|null} version
+ * @returns {number} NaN when the version is unreadable
+ */
+function versionNumber(version) {
+	return Number.parseFloat(String(version ?? ""));
+}
+
+/**
+ * unifi-cli's endpoint-version rule: Network 7.4 and later run UniFi OS.
+ * @param {string|null} version
+ * @returns {"unifi_os_v2"|"unifi_os_v1"}
+ */
+export function classifyEndpointVersion(version) {
+	return versionNumber(version) >= 7.4 ? "unifi_os_v2" : "unifi_os_v1";
 }
 
 /**
@@ -83,24 +96,11 @@ async function officialProbe(relativePath, siteId) {
 
 /**
  * One legacy detection check (unifi-cli's `tryCheck` shape): fetch a URL with
- * the session's cookies, pick a data object, resolve the endpoint version.
+ * the session's headers, pick a data object, resolve the endpoint version.
  * Returns { data } on success, null on failure.
  */
-async function legacyCheck(siteData, url) {
-	const state = getSite(siteData.site);
-	try {
-		const res = await siteData.fetch(url, {
-			headers: {
-				...(state.cookies ? { "Cookie": state.cookies } : {}),
-				...(state.csrfToken ? { "X-Csrf-Token": state.csrfToken } : {})
-			}
-		});
-		if (!res.ok) return null;
-		const body = await res.json();
-		return { data: body?.data?.[0] ?? null, body };
-	} catch {
-		return null;
-	}
+async function legacyCheck(url) {
+	return context.unifi.legacy.check(url);
 }
 
 /**
@@ -112,18 +112,19 @@ async function legacyCheck(siteData, url) {
  *   null when the login fails.
  */
 async function probeLegacy(siteKey) {
+	const legacy = context.unifi.legacy;
 	try {
-		await login(siteKey);
+		await legacy.login(siteKey);
 	} catch (err) {
 		// The probe classifies; it does not raise. The failure reason rides the
 		// report so callers can tell a refused login from an unreachable one.
 		return { authError: { code: err?.code ?? "AUTH_LOGIN_FAILED", message: err?.message ?? String(err), attempts: err?.attempts ?? null } };
 	}
 
-	const siteData = getSiteData(siteKey);
-	const prefix = siteData.api.prefix;
-	const base = `${siteData.host_url.replace(/\/+$/, "")}${prefix.replace(/\/+$/, "")}`;
-	const site = siteData.site;
+	const meta = legacy.meta(siteKey);
+	const prefix = meta.prefix;
+	const base = `${(meta.hostUrl ?? context.unifi.baseUrl).replace(/\/+$/, "")}${prefix.replace(/\/+$/, "")}`;
+	const site = siteKey;
 
 	let version = null;
 	let updateAvailable = null;
@@ -133,20 +134,19 @@ async function probeLegacy(siteKey) {
 	let endpointVersion = "legacy";
 
 	// 1. stat/sysinfo: version >= 7.4 -> unifi_os_v2, else unifi_os_v1.
-	const sysinfo = await legacyCheck(siteData, `${base}/api/s/${site}/stat/sysinfo`);
+	const sysinfo = await legacyCheck(`${base}/api/s/${site}/stat/sysinfo`);
 	if (sysinfo?.data) {
 		version = sysinfo.data.version ?? sysinfo.data.server_version ?? null;
 		updateAvailable = typeof sysinfo.data.update_available === "boolean" ? sysinfo.data.update_available : null;
 		hostname = sysinfo.data.hostname ?? null;
 		name = sysinfo.data.name ?? null;
 		deviceType = sysinfo.data.ubnt_device_type ?? sysinfo.data.device_type ?? null;
-		const major = majorOf(version);
-		endpointVersion = major !== null && major >= 7.4 ? "unifi_os_v2" : "unifi_os_v1";
+		endpointVersion = classifyEndpointVersion(version);
 	}
 
 	// 2. stat/sites (keeps unifi-cli's original assumption: unifi_os_v2).
 	if (version === null) {
-		const sites = await legacyCheck(siteData, `${base}/api/stat/sites`);
+		const sites = await legacyCheck(`${base}/api/stat/sites`);
 		if (sites?.data) {
 			version = sites.data.version ?? sites.data.server_version ?? null;
 			endpointVersion = "unifi_os_v2";
@@ -157,7 +157,7 @@ async function probeLegacy(siteKey) {
 	// NVR object lives under .nvr (not under data[0]), per unifi-cli's
 	// tryProtectBootstrap pick.
 	if (version === null) {
-		const bootstrap = await legacyCheck(siteData, `${base}/api/bootstrap`);
+		const bootstrap = await legacyCheck(`${base}/api/bootstrap`);
 		if (bootstrap?.body?.nvr) {
 			version = bootstrap.body.nvr.version ?? null;
 			deviceType = "nvr";
@@ -166,27 +166,33 @@ async function probeLegacy(siteKey) {
 	}
 	// 4. Nothing answered: unifi-cli's final fallback — legacy endpoints, no version.
 
-	setSite(siteKey, { endpointType: "network", endpointVersion, version, hostname, name, deviceType });
+	legacy.setMeta(siteKey, { endpointType: "network", endpointVersion, version, hostname, name, deviceType });
 
 	// --- UDM/NVR probes (unifi-cli's util.controller.detectDeviceType) ---
+	const config = context.unifi;
+	const hostUrl = (meta.hostUrl ?? config.baseUrl).replace(/\/$/, "");
 	let detectedType = "unknown";
 	try {
-		const networkRes = await siteData.fetch(`${siteData.host_url.replace(/\/$/, "")}/proxy/network/api`);
+		const networkRes = await config.fetch(`${hostUrl}/proxy/network/api`, {
+			signal: AbortSignal.timeout(config.timeoutMs)
+		});
 		const text = await networkRes.text();
-		if (networkRes.ok || typeof text !== "string" || text.includes("Cannot GET /api")) detectedType = "udm";
+		if (networkRes.ok || text.includes("Cannot GET /api")) detectedType = "udm";
 	} catch {
 		/* not a UDM */
 	}
 	if (detectedType !== "udm") {
 		try {
-			const protectRes = await siteData.fetch(`${siteData.host_url.replace(/\/$/, "")}/proxy/protect/api`);
+			const protectRes = await config.fetch(`${hostUrl}/proxy/protect/api`, {
+				signal: AbortSignal.timeout(config.timeoutMs)
+			});
 			const text = await protectRes.text();
-			if (protectRes.ok || (typeof text === "string" && text.includes("Cannot GET /api"))) detectedType = "nvr";
+			if (protectRes.ok || text.includes("Cannot GET /api")) detectedType = "nvr";
 		} catch {
 			/* not an NVR */
 		}
 	}
-	if (detectedType !== "unknown") setSite(siteKey, { deviceType: detectedType });
+	if (detectedType !== "unknown") legacy.setMeta(siteKey, { deviceType: detectedType });
 
 	// --- legacy capability reads ---
 	const staticDnsReachable = await legacyProbe("static_dns_list", siteKey);
@@ -204,7 +210,7 @@ async function probeLegacy(siteKey) {
 				records: staticDnsReachable,
 				// Forward Domain needs a 9.x Network application (plan §1); when the
 				// version is unreadable the probe refuses to claim it.
-				forward: staticDnsReachable && (majorOf(version) ?? 0) >= 9
+				forward: staticDnsReachable && versionNumber(version) >= 9
 			}
 		}
 	};
@@ -226,45 +232,61 @@ export async function runProbe(options = {}) {
 	const result = {
 		networks: "none",
 		clients: "none",
+		devices: "none",
 		fixedIp: "none",
 		dns: { records: "none", forward: "none" },
 		version: null,
 		applicationVersion: null,
 		updateAvailable: null,
 		site: null,
+		// Whether the official Integration API surface is usable at all (the
+		// application info and the site list answered with the given API key).
+		official: false,
 		endpointVersion: null,
-		authError: null
+		// Legacy auth failure (both login attempts refused).
+		authError: null,
+		// Official surface failure (the API key refused, or the info/site list
+		// unreachable) — so a silently-degraded all-legacy instance is visible.
+		officialError: null,
+		// TLS pinning is the caller's fetch's business; the report only says how
+		// many pins were configured (the values are never stored or reported).
+		tls: { spkiPins: config.tls.spkiPins }
 	};
 
-	if (config.credentials.apiKey) {
+	if (config.hasApiKey) {
 		try {
 			const info = await officialInfo();
 			result.applicationVersion = info.applicationVersion;
 			const siteId = await resolveOfficialSiteId(siteKey);
 			result.site = siteId;
-			const [networksOk, clientsOk, policiesOk] = await Promise.all([
+			result.official = true;
+			const [networksOk, clientsOk, policiesOk, devicesOk] = await Promise.all([
 				officialProbe("networks", siteId),
 				officialProbe("clients", siteId),
-				officialProbe("dns/policies", siteId)
+				officialProbe("dns/policies", siteId),
+				officialProbe("devices", siteId)
 			]);
 			result.networks = networksOk ? "official" : "none";
 			result.clients = clientsOk ? "official" : "none";
+			result.devices = devicesOk ? "official" : "none";
 			result.dns.records = policiesOk ? "official" : "none";
 			result.dns.forward = policiesOk ? "official" : "none";
 			if (info.applicationVersion) result.version = info.applicationVersion;
-		} catch {
-			// The official surface answered nothing usable — fall through to legacy.
+		} catch (err) {
+			// The official surface answered nothing usable — fall through to
+			// legacy, but say why: a refused key with working legacy credentials
+			// degrades silently otherwise.
+			result.officialError = {
+				code: err?.status === 401 ? "OFFICIAL_UNAUTHORIZED" : err?.code === "OFFICIAL_NO_API_KEY" ? err.code : "OFFICIAL_UNREACHABLE",
+				message: err?.message ?? String(err)
+			};
 		}
 	}
 
-	if (
-		config.credentials.legacy?.username &&
-		config.credentials.legacy.password !== null &&
-		config.credentials.legacy.password !== undefined
-	) {
+	if (config.hasLegacy) {
 		// The legacy probe logs in; clear any half-written session state first so
 		// the login result is the only thing in the session.
-		clearAllSites();
+		context.unifi.legacy.clearAll();
 		const probed = await probeLegacy(siteKey);
 		if (probed?.authError) {
 			result.authError = probed.authError;

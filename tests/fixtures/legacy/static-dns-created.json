@@ -2,7 +2,7 @@
 	"_source": "POST/PUT v2/api/site/{site}/static-dns response: the stored row (200). Shape per sirkirby/unifi-mcp dns_manager.py; the id here is a documentation value. Hand-written.",
 	"_id": "s4d5e6f7a8b94c0d8e1f3a4b5c6d7e8f",
 	"enabled": true,
-	"key": "test.homelab.cldmv.net",
+	"key": "test.homelab.example.com",
 	"record_type": "forward",
 	"value": "192.0.2.53"
 }

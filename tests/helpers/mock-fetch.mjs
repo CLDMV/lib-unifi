@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -108,6 +108,21 @@ export const OFFICIAL_ROOT = "/proxy/network/integration/v1";
 
 /** The site UUID the fixture official API reports for the "default" site. */
 export const SITE_ID = "d1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c";
+
+/** Fixture resource ids (patterned documentation UUIDs, one per fixture row). */
+export const DEVICE_ID = "b1a2b3c4-d5e6-4f7a-8b9c-1a2b3c4d5e6f";
+export const CLIENT_DETAIL_ID = "a1b2c3d4-1111-4222-8333-444455556666";
+export const WLAN_ID = "c8d9e0f1-a2b3-4c4d-5e6f-8a9b0c1d2e3f";
+export const POLICY_ID = "f5e6f7a8-b9c0-4d1e-2f3a-5e6f7a8b9c0d";
+export const ZONE_ID = "a1b2c3d4-0000-4000-8000-000000000001";
+export const ACL_ID = "a6b7c8d9-e0f1-4a2b-3c4d-6f7a8b9c0d1e";
+export const MATCHING_ID = "b7c8d9e0-f1a2-4b3c-4d5e-7a8b9c0d1e2f";
+export const VOUCHER_ID = "a2b3c4d5-e6f7-4a8b-9c0d-2e3f4a5b6c7d";
+export const LAG_ID = "b3c4d5e6-f7a8-4b9c-0d1e-3f4a5b6c7d8e";
+export const STACK_ID = "c4d5e6f7-a8b9-4c0d-1e2f-4a5b6c7d8e9f";
+export const MCLAG_ID = "d5e6f7a8-b9c0-4d1e-2f3a-5b6c7d8e9f0a";
+export const VPN_SERVER_ID = "e0f1a2b3-c4d5-4e6f-7a8b-0c1d2e3f4a5b";
+export const TUNNEL_ID = "f1a2b3c4-d5e6-4f7a-8b9c-1d2e3f4a5b6c";
 
 /** Standard legacy UniFi OS paths. */
 export const LEGACY_ROOT = "/proxy/network/api";

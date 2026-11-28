@@ -1,0 +1,43 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "f5e6f7a8-b9c0-4d1e-2f3a-5e6f7a8b9c0d",
+			"index": 2000,
+			"name": "Allow IoT to NTP",
+			"description": "",
+			"enabled": true,
+			"action": {
+				"type": "ALLOW",
+				"allowReturnTraffic": true
+			},
+			"source": {
+				"zoneId": "a1b2c3d4-0000-4000-8000-000000000001",
+				"trafficFilter": {
+					"type": "NETWORK",
+					"networkIds": ["66666666-7777-4888-8999-000000000000"]
+				}
+			},
+			"destination": {
+				"zoneId": "a1b2c3d4-0000-4000-8000-000000000002",
+				"trafficFilter": {
+					"type": "IP_ADDRESS",
+					"ipAddresses": ["192.0.2.53"]
+				}
+			},
+			"ipProtocolScope": {
+				"type": "PRESET",
+				"preset": "UDP"
+			},
+			"connectionStateFilter": ["NEW"],
+			"ipsecFilter": null,
+			"loggingEnabled": false,
+			"reportFlowEnabled": true,
+			"schedule": null
+		}
+	]
+}

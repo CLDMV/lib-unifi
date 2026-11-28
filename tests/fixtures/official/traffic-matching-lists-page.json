@@ -1,0 +1,15 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "b7c8d9e0-f1a2-4b3c-4d5e-7a8b9c0d1e2f",
+			"name": "NTP servers",
+			"type": "IPV4",
+			"subnets": ["192.0.2.53/32"]
+		}
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"id": "b3c4d5e6-f7a8-4b9c-0d1e-3f4a5b6c7d8e",
+	"type": "LOCAL",
+	"members": [
+		{
+			"deviceId": "c2b3c4d5-e6f7-4a8b-9c0d-2b3c4d5e6f7a",
+			"portIdxs": [23, 24]
+		}
+	]
+}

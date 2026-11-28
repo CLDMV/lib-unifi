@@ -1,0 +1,19 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 2,
+	"totalCount": 2,
+	"data": [
+		{
+			"id": "a1b2c3d4-0000-4000-8000-000000000001",
+			"name": "Internal",
+			"networkIds": ["11111111-2222-4333-8444-555555555555"]
+		},
+		{
+			"id": "a1b2c3d4-0000-4000-8000-000000000002",
+			"name": "External",
+			"networkIds": []
+		}
+	]
+}

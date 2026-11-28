@@ -12,7 +12,7 @@
 		"autoScaleEnabled": false,
 		"dhcpConfiguration": {
 			"mode": "SERVER",
-			"domainName": "iot.cldmv.net",
+			"domainName": "iot.example.com",
 			"leaseTimeSeconds": 3600,
 			"dhcpEnabled": true,
 			"dnsServerIpAddressesOverride": ["192.0.2.53", "192.0.2.54"]

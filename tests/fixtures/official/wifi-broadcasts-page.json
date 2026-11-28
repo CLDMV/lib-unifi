@@ -1,0 +1,24 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "c8d9e0f1-a2b3-4c4d-5e6f-8a9b0c1d2e3f",
+			"name": "Homelab",
+			"type": "STANDARD",
+			"enabled": true,
+			"network": {
+				"type": "NATIVE",
+				"nativeNetworkId": "11111111-2222-4333-8444-555555555555"
+			},
+			"securityConfiguration": {
+				"type": "WPA2_PERSONAL",
+				"passphrase": null
+			},
+			"broadcastingDeviceFilter": null
+		}
+	]
+}

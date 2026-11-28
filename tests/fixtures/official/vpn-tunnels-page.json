@@ -1,0 +1,14 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "f1a2b3c4-d5e6-4f7a-8b9c-1d2e3f4a5b6c",
+			"name": "Office link",
+			"type": "IPSEC"
+		}
+	]
+}

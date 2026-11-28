@@ -1,0 +1,16 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. The batch_add answer: the created rows.",
+	"meta": {
+		"rc": "ok"
+	},
+	"data": [
+		{
+			"_id": "r1a2b3c4d5e6f7a8b9c0d1e2",
+			"name": "device-auth-1",
+			"x_password": "doc-radius-pass-1",
+			"tunnel_type": 13,
+			"tunnel_medium_type": 6,
+			"vlan": 20
+		}
+	]
+}

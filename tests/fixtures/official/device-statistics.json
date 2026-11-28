@@ -1,0 +1,23 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"cpuUtilizationPct": 8.5,
+	"memoryUtilizationPct": 42.1,
+	"loadAverage1Min": 0.4,
+	"loadAverage5Min": 0.3,
+	"loadAverage15Min": 0.2,
+	"uptimeSec": 864000,
+	"lastHeartbeatAt": "2026-11-28T00:00:00Z",
+	"nextHeartbeatAt": "2026-11-28T00:01:00Z",
+	"uplink": {
+		"rxRateBps": 1200000,
+		"txRateBps": 340000
+	},
+	"interfaces": {
+		"radios": [
+			{
+				"frequencyGHz": 5,
+				"txRetriesPct": 1.2
+			}
+		]
+	}
+}

@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:07-08:00 (1795870567)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -100,7 +100,7 @@ describe("capabilities probe", () => {
 		await unifi.slothlet.shutdown();
 	});
 
-	test("an invalid API key with no legacy credentials classifies none", async () => {
+	test("an invalid API key with no legacy credentials classifies none and reports the official failure", async () => {
 		const routes = [
 			{
 				path: "/proxy/network/integration/v1/info",
@@ -117,6 +117,27 @@ describe("capabilities probe", () => {
 		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "bad-key" } });
 		const caps = await unifi.capabilities();
 		expect(caps).toMatchObject({ networks: "none", clients: "none", dns: { records: "none", forward: "none" }, version: null });
+		// The refused key is visible on the report — an official failure no
+		// longer degrades silently.
+		expect(caps.official).toBe(false);
+		expect(caps.officialError).toMatchObject({ code: "OFFICIAL_UNAUTHORIZED" });
+		await unifi.slothlet.shutdown();
+	});
+
+	test("the official surface failing after /info reports the failure, not a silent degradation", async () => {
+		const fetch = mockFetch([
+			...officialRoutes({ sites: false, networks: false, clients: false, policies: false }),
+			...legacyRoutes({ udmProbe: false })
+		]);
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { apiKey: "doc-api-key", legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.networks).toBe("legacy");
+		expect(caps.official).toBe(false);
+		expect(caps.officialError).toMatchObject({ code: "OFFICIAL_UNREACHABLE" });
 		await unifi.slothlet.shutdown();
 	});
 
@@ -191,6 +212,84 @@ describe("capabilities probe", () => {
 		expect(cached.version).toBe("9.3.43");
 		await unifi.capabilities({ refresh: true });
 		expect(fetch.calls.length).toBeGreaterThan(callsAfterFirst);
+		await unifi.slothlet.shutdown();
+	});
+});
+
+describe("version classification and the report extras", () => {
+	// S2: the classification is unifi-cli's parseFloat(version) >= 7.4 — a
+	// major-only parse regressed 7.4-7.x to unifi_os_v1.
+	test.each([
+		["sysinfo-7.3", "unifi_os_v1"],
+		["sysinfo-7.4", "unifi_os_v2"],
+		["sysinfo", "unifi_os_v2"]
+	])("sysinfo %s classifies %s at the 7.4 boundary", async (fixtureName, expected) => {
+		const fetch = mockFetch(legacyRoutes({ sysinfo: fixtureName }));
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.endpointVersion).toBe(expected);
+		await unifi.slothlet.shutdown();
+	});
+
+	test("configured spki pins are counted on the report (the values are never stored)", async () => {
+		const fetch = mockFetch(officialRoutes());
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { apiKey: "doc-api-key" },
+			tls: { spkiPins: ["sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", "sha256/BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB="] }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.tls).toEqual({ spkiPins: 2 });
+		expect(JSON.stringify(caps)).not.toContain("sha256/");
+		// Pinning itself lives in the caller's fetch: the library never opens
+		// sockets, so the fetch it calls is the one handed in.
+		expect(fetch.calls.length).toBeGreaterThan(0);
+		await unifi.slothlet.shutdown();
+	});
+
+	test("no tls config reports null pins", async () => {
+		const fetch = mockFetch(legacyRoutes());
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.tls).toEqual({ spkiPins: null });
+		await unifi.slothlet.shutdown();
+	});
+
+	test("official: true marks the official surface usable; official-only leaves gate on it", async () => {
+		const fetch = mockFetch(officialRoutes());
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "doc-api-key" } });
+		const caps = await unifi.capabilities();
+		expect(caps.official).toBe(true);
+		expect(caps.officialError).toBe(null);
+		// An official-only leaf works off the same report...
+		const wans = await unifi.wan.list();
+		expect(wans).toHaveLength(1);
+		// ...and the official-only gate does not re-probe (the report is cached).
+		const callsAfterCaps = fetch.calls.length;
+		await unifi.firewall.zones.list();
+		expect(fetch.calls.length).toBeGreaterThan(callsAfterCaps);
+		await unifi.slothlet.shutdown();
+	});
+
+	test("official: false gates the official-only leaves with a capability error", async () => {
+		const fetch = mockFetch(legacyRoutes());
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		await expect(unifi.wan.list()).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE", capability: "wan" });
+		await expect(unifi.dpi.applications.list()).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE" });
+		await expect(unifi.firewall.zones.list()).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE" });
 		await unifi.slothlet.shutdown();
 	});
 });

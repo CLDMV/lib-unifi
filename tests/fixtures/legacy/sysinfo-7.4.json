@@ -1,0 +1,15 @@
+{
+	"_source": "GET api/s/{site}/stat/sysinfo at the 7.4 boundary: unifi-cli lib/api/util/controller.mjs classifies version >= 7.4 (parseFloat, so 7.4.x counts) as endpointVersion unifi_os_v2. Hand-written.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"version": "7.4.187",
+			"build": "atag_7.4.187_00000",
+			"update_available": false,
+			"hostname": "ucg",
+			"name": "ucg",
+			"ubnt_device_type": "UCG",
+			"timezone": "Etc/UTC"
+		}
+	]
+}

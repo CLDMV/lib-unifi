@@ -1,0 +1,23 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "c4d5e6f7-a8b9-4c0d-1e2f-4a5b6c7d8e9f",
+			"name": "Closet stack",
+			"deviceId": "c2b3c4d5-e6f7-4a8b-9c0d-2b3c4d5e6f7a",
+			"units": [
+				{
+					"id": 1,
+					"macAddress": "00:00:5e:00:53:0b",
+					"order": 1,
+					"role": "MASTER"
+				}
+			],
+			"lags": []
+		}
+	]
+}

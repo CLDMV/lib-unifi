@@ -19,7 +19,7 @@
 			"dhcpd_dns_2": "192.0.2.1",
 			"dhcpd_dns_3": "",
 			"dhcpd_dns_4": "",
-			"domain_name": "homelab.cldmv.net"
+			"domain_name": "homelab.example.com"
 		},
 		{
 			"_id": "66666666777748888899000000000000",
@@ -38,7 +38,7 @@
 			"dhcpd_dns_2": "",
 			"dhcpd_dns_3": "",
 			"dhcpd_dns_4": "",
-			"domain_name": "iot.cldmv.net"
+			"domain_name": "iot.example.com"
 		},
 		{
 			"_id": "aaaaaaaaaaaa4bbbbbbbcccccccccccc",

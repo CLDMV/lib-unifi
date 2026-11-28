@@ -1,0 +1,27 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "a6b7c8d9-e0f1-4a2b-3c4d-6f7a8b9c0d1e",
+			"index": 1,
+			"name": "Block printer internet",
+			"type": "IP",
+			"action": "BLOCK",
+			"enabled": true,
+			"description": "",
+			"sourceFilter": {
+				"type": "SUBNET",
+				"subnets": ["203.0.113.0/24"]
+			},
+			"destinationFilter": {
+				"type": "IP_ADDRESS",
+				"ipAddresses": ["0.0.0.0/0"]
+			},
+			"enforcingDeviceFilter": null
+		}
+	]
+}

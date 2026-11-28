@@ -1,0 +1,23 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. unifi-cli's port_config row (api/s/{site}/rest/portconf).",
+	"meta": {
+		"rc": "ok"
+	},
+	"data": [
+		{
+			"_id": "p1a2b3c4d5e6f7a8b9c0d1e2",
+			"name": "All Ports",
+			"purpose": "switch",
+			"portconf_id": "p1a2b3c4d5e6f7a8b9c0d1e2",
+			"autoneg": true,
+			"speed": 1000,
+			"duplex": "full",
+			"poe_mode": "auto",
+			"dot1x": "auto",
+			"stp_port_mode": true,
+			"stormctrl_enabled": false,
+			"isolation": false,
+			"trafficshaping_enabled": false
+		}
+	]
+}

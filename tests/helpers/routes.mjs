@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -26,7 +26,21 @@
  * official Integration API sits under `/proxy/network/integration/v1`.
  */
 
-import { createMockFetch, fixture, CONTROLLER, OFFICIAL_ROOT, SITE_ID, LEGACY_ROOT } from "./mock-fetch.mjs";
+import {
+	createMockFetch,
+	fixture,
+	CONTROLLER,
+	OFFICIAL_ROOT,
+	SITE_ID,
+	LEGACY_ROOT,
+	DEVICE_ID,
+	CLIENT_DETAIL_ID,
+	WLAN_ID,
+	VOUCHER_ID,
+	LAG_ID,
+	STACK_ID,
+	MCLAG_ID
+} from "./mock-fetch.mjs";
 
 /** The official site-scoped path prefix for the fixture site. */
 const sitePath = `${OFFICIAL_ROOT}/sites/${SITE_ID}`;
@@ -36,7 +50,24 @@ const sitePath = `${OFFICIAL_ROOT}/sites/${SITE_ID}`;
  * @param {{ info?: boolean, sites?: boolean, networks?: boolean, clients?: boolean, policies?: boolean, networksPage?: object }} [enabled]
  */
 export function officialRoutes(enabled = {}) {
-	const on = { info: true, sites: true, networks: true, clients: true, policies: true, ...enabled };
+	const on = {
+		info: true,
+		sites: true,
+		networks: true,
+		clients: true,
+		policies: true,
+		devices: true,
+		firewall: true,
+		wlans: true,
+		radius: true,
+		vouchers: true,
+		switching: true,
+		vpn: true,
+		wan: true,
+		dpi: true,
+		countries: true,
+		...enabled
+	};
 	const routes = [];
 	if (on.info) routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/info`, body: fixture("official/info") });
 	if (on.sites) routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/sites`, body: fixture("official/sites") });
@@ -52,9 +83,20 @@ export function officialRoutes(enabled = {}) {
 			path: `${sitePath}/networks/66666666-7777-4888-8999-000000000000`,
 			body: fixture("official/network-iot")
 		});
+		routes.push({ method: "POST", path: `${sitePath}/networks`, body: fixture("official/network-iot") });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/networks/[^/]+$`), body: "" });
 	}
 	if (on.clients) routes.push({ method: "GET", path: `${sitePath}/clients`, body: fixture("official/clients-page") });
-	if (on.policies) routes.push({ method: "GET", path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page") });
+	if (on.policies) {
+		routes.push({ method: "GET", path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page") });
+		routes.push({
+			method: "GET",
+			path: new RegExp(`${sitePath}/dns/policies/[^/]+$`),
+			body: fixture("official/dns-policies-page").data[0]
+		});
+		routes.push({ method: "POST", path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page").data[0] });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/dns/policies/[^/]+$`), body: "" });
+	}
 	// The update PUTs echo the stored object.
 	if (on.networks)
 		routes.push({ method: "PUT", path: new RegExp(`${sitePath}/networks/[^/]+$`), body: fixture("official/network-default") });
@@ -64,6 +106,119 @@ export function officialRoutes(enabled = {}) {
 			path: new RegExp(`${sitePath}/dns/policies/[^/]+$`),
 			body: fixture("official/dns-policies-page").data[1]
 		});
+	if (on.devices) {
+		routes.push({ method: "GET", path: `${sitePath}/devices`, body: fixture("official/devices-page") });
+		routes.push({ method: "GET", path: `${sitePath}/devices/${DEVICE_ID}`, body: fixture("official/device-detail") });
+		routes.push({ method: "GET", path: `${sitePath}/devices/${DEVICE_ID}/statistics/latest`, body: fixture("official/device-statistics") });
+		routes.push({ method: "GET", path: `${sitePath}/device-tags`, body: fixture("official/device-tags") });
+		routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/pending-devices`, body: fixture("official/pending-devices") });
+		routes.push({ method: "POST", path: `${sitePath}/devices`, body: fixture("official/device-detail") });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/devices/[^/]+$`), body: "" });
+		routes.push({ method: "POST", path: new RegExp(`${sitePath}/devices/[^/]+/actions$`), body: "" });
+		routes.push({ method: "POST", path: new RegExp(`${sitePath}/devices/[^/]+/interfaces/ports/[^/]+/actions$`), body: "" });
+	}
+	if (on.clients) {
+		routes.push({ method: "GET", path: `${sitePath}/clients/${CLIENT_DETAIL_ID}`, body: fixture("official/clients-detail") });
+		routes.push({ method: "POST", path: new RegExp(`${sitePath}/clients/[^/]+/actions$`), body: "" });
+	}
+	if (on.firewall) {
+		routes.push({ method: "GET", path: `${sitePath}/firewall/policies`, body: fixture("official/firewall-policies-page") });
+		routes.push({ method: "GET", path: `${sitePath}/firewall/policies/ordering`, body: fixture("official/firewall-policy-ordering") });
+		routes.push({ method: "GET", path: `${sitePath}/firewall/zones`, body: fixture("official/firewall-zones-page") });
+		routes.push({ method: "GET", path: `${sitePath}/acl-rules`, body: fixture("official/acl-rules-page") });
+		routes.push({ method: "GET", path: `${sitePath}/acl-rules/ordering`, body: fixture("official/acl-ordering") });
+		routes.push({ method: "GET", path: `${sitePath}/traffic-matching-lists`, body: fixture("official/traffic-matching-lists-page") });
+		// The write verbs echo a stored/created row (the ordering routes must sit
+		// before the id-shaped regexes so "ordering" is not read as an id).
+		routes.push({
+			method: "GET",
+			path: new RegExp(`${sitePath}/firewall/policies/[^/]+$`),
+			body: fixture("official/firewall-policies-page").data[0]
+		});
+		routes.push({ method: "POST", path: `${sitePath}/firewall/policies`, body: fixture("official/firewall-created") });
+		routes.push({ method: "PUT", path: `${sitePath}/firewall/policies/ordering`, body: fixture("official/firewall-policy-ordering") });
+		routes.push({
+			method: "PUT",
+			path: new RegExp(`${sitePath}/firewall/policies/[^/]+$`),
+			body: fixture("official/firewall-policies-page").data[0]
+		});
+		routes.push({
+			method: "PATCH",
+			path: new RegExp(`${sitePath}/firewall/policies/[^/]+$`),
+			body: fixture("official/firewall-policies-page").data[0]
+		});
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/firewall/policies/[^/]+$`), body: "" });
+		routes.push({
+			method: "GET",
+			path: new RegExp(`${sitePath}/firewall/zones/[^/]+$`),
+			body: fixture("official/firewall-zones-page").data[0]
+		});
+		routes.push({ method: "POST", path: `${sitePath}/firewall/zones`, body: fixture("official/firewall-zones-page").data[0] });
+		routes.push({
+			method: "PUT",
+			path: new RegExp(`${sitePath}/firewall/zones/[^/]+$`),
+			body: fixture("official/firewall-zones-page").data[0]
+		});
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/firewall/zones/[^/]+$`), body: "" });
+		routes.push({ method: "GET", path: new RegExp(`${sitePath}/acl-rules/[^/]+$`), body: fixture("official/acl-rules-page").data[0] });
+		routes.push({ method: "POST", path: `${sitePath}/acl-rules`, body: fixture("official/acl-rules-page").data[0] });
+		routes.push({ method: "PUT", path: `${sitePath}/acl-rules/ordering`, body: fixture("official/acl-ordering") });
+		routes.push({ method: "PUT", path: new RegExp(`${sitePath}/acl-rules/[^/]+$`), body: fixture("official/acl-rules-page").data[0] });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/acl-rules/[^/]+$`), body: "" });
+		routes.push({
+			method: "GET",
+			path: new RegExp(`${sitePath}/traffic-matching-lists/[^/]+$`),
+			body: fixture("official/traffic-matching-lists-page").data[0]
+		});
+		routes.push({
+			method: "POST",
+			path: `${sitePath}/traffic-matching-lists`,
+			body: fixture("official/traffic-matching-lists-page").data[0]
+		});
+		routes.push({
+			method: "PUT",
+			path: new RegExp(`${sitePath}/traffic-matching-lists/[^/]+$`),
+			body: fixture("official/traffic-matching-lists-page").data[0]
+		});
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/traffic-matching-lists/[^/]+$`), body: "" });
+	}
+	if (on.wlans) {
+		routes.push({ method: "GET", path: `${sitePath}/wifi/broadcasts`, body: fixture("official/wifi-broadcasts-page") });
+		routes.push({ method: "GET", path: `${sitePath}/wifi/broadcasts/${WLAN_ID}`, body: fixture("official/wifi-broadcast-detail") });
+		routes.push({ method: "POST", path: `${sitePath}/wifi/broadcasts`, body: fixture("official/wifi-broadcast-detail") });
+		routes.push({ method: "PUT", path: new RegExp(`${sitePath}/wifi/broadcasts/[^/]+$`), body: fixture("official/wifi-broadcast-detail") });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/wifi/broadcasts/[^/]+$`), body: "" });
+	}
+	if (on.radius) routes.push({ method: "GET", path: `${sitePath}/radius/profiles`, body: fixture("official/radius-profiles-page") });
+	if (on.vouchers) {
+		routes.push({ method: "GET", path: `${sitePath}/hotspot/vouchers`, body: fixture("official/hotspot-vouchers-page") });
+		routes.push({
+			method: "GET",
+			path: `${sitePath}/hotspot/vouchers/${VOUCHER_ID}`,
+			body: fixture("official/hotspot-vouchers-page").data[0]
+		});
+		routes.push({ method: "POST", path: `${sitePath}/hotspot/vouchers`, body: fixture("official/hotspot-vouchers-created") });
+		routes.push({ method: "DELETE", path: `${sitePath}/hotspot/vouchers`, body: { vouchersDeleted: 2 } });
+		routes.push({ method: "DELETE", path: new RegExp(`${sitePath}/hotspot/vouchers/[^/]+$`), body: { vouchersDeleted: 1 } });
+	}
+	if (on.switching) {
+		routes.push({ method: "GET", path: `${sitePath}/switching/lags`, body: fixture("official/switching-lags-page") });
+		routes.push({ method: "GET", path: `${sitePath}/switching/lags/${LAG_ID}`, body: fixture("official/lag-detail") });
+		routes.push({ method: "GET", path: `${sitePath}/switching/switch-stacks`, body: fixture("official/switch-stacks-page") });
+		routes.push({ method: "GET", path: `${sitePath}/switching/switch-stacks/${STACK_ID}`, body: fixture("official/switch-stack-detail") });
+		routes.push({ method: "GET", path: `${sitePath}/switching/mc-lag-domains`, body: fixture("official/mc-lag-domains-page") });
+		routes.push({ method: "GET", path: `${sitePath}/switching/mc-lag-domains/${MCLAG_ID}`, body: fixture("official/mc-lag-detail") });
+	}
+	if (on.vpn) {
+		routes.push({ method: "GET", path: `${sitePath}/vpn/servers`, body: fixture("official/vpn-servers-page") });
+		routes.push({ method: "GET", path: `${sitePath}/vpn/site-to-site-tunnels`, body: fixture("official/vpn-tunnels-page") });
+	}
+	if (on.wan) routes.push({ method: "GET", path: `${sitePath}/wans`, body: fixture("official/wans-page") });
+	if (on.dpi) {
+		routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/dpi/applications`, body: fixture("official/dpi-applications-page") });
+		routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/dpi/categories`, body: fixture("official/dpi-categories-page") });
+	}
+	if (on.countries) routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/countries`, body: fixture("official/countries-page") });
 	return routes;
 }
 
@@ -106,6 +261,10 @@ export function legacyRoutes(options = {}) {
 		networkConfUpdate: true,
 		clientUpdate: true,
 		staticDnsWrite: true,
+		radiusUsers: true,
+		admins: true,
+		portconf: true,
+		devices: true,
 		...options
 	};
 	const routes = [];
@@ -141,6 +300,7 @@ export function legacyRoutes(options = {}) {
 	if (opts.sta) {
 		routes.push({ path: `${LEGACY_ROOT}/s/default/stat/sta`, body: fixture("legacy/sta") });
 		routes.push({ path: `/api/s/default/stat/sta`, body: fixture("legacy/sta") });
+		routes.push({ path: /\/stat\/user\/[^/]+$/, body: fixture("legacy/user-records").data[0] });
 	}
 	if (opts.userRecords) {
 		routes.push({ path: `${LEGACY_ROOT}/s/default/rest/user`, body: fixture("legacy/user-records") });
@@ -148,6 +308,41 @@ export function legacyRoutes(options = {}) {
 	}
 	if (opts.clientUpdate) {
 		routes.push({ method: "PUT", path: /\/rest\/user\/[^/]+$/, body: fixture("legacy/client-update-ok") });
+	}
+
+	if (opts.radiusUsers) {
+		routes.push({ path: "/proxy/network/v2/api/site/default/radius/users", body: fixture("legacy/radius-users") });
+		routes.push({ path: `/v2/api/site/default/radius/users`, body: fixture("legacy/radius-users") });
+		routes.push({ path: `${LEGACY_ROOT}/s/default/rest/radiususer`, body: fixture("legacy/radius-users") });
+		routes.push({ path: `/api/s/default/rest/radiususer`, body: fixture("legacy/radius-users") });
+		routes.push({ path: `${LEGACY_ROOT}/s/default/rest/account`, body: fixture("legacy/radius-users") });
+		routes.push({ path: `/api/s/default/rest/account`, body: fixture("legacy/radius-users") });
+	}
+	if (opts.radiusUsers) {
+		routes.push({ method: "POST", path: /\/radius\/users\/batch_add$/, body: fixture("legacy/radius-user-created") });
+		routes.push({ method: "PUT", path: /\/radius\/users\/batch_update$/, body: fixture("legacy/radius-user-updated") });
+		routes.push({ method: "DELETE", path: /\/radius\/users\/[^/]+$/, body: fixture("legacy/radius-delete-ok") });
+		routes.push({ method: "POST", path: /\/rest\/(radiususer|account)$/, body: fixture("legacy/radius-user-created") });
+		routes.push({ method: "PUT", path: /\/rest\/(radiususer|account)\/[^/]+$/, body: fixture("legacy/radius-user-updated") });
+		routes.push({ method: "DELETE", path: /\/rest\/(radiususer|account)\/[^/]+$/, body: fixture("legacy/radius-delete-ok") });
+	}
+	if (opts.admins) {
+		routes.push({ path: "/proxy/network/v2/api/site/default/user", body: fixture("legacy/admins") });
+		routes.push({ path: `/v2/api/site/default/user`, body: fixture("legacy/admins") });
+		routes.push({ path: `${LEGACY_ROOT}/s/default/rest/admin`, body: fixture("legacy/admins") });
+		routes.push({ path: `/api/s/default/rest/admin`, body: fixture("legacy/admins") });
+		routes.push({ path: /\/v2\/api\/site\/default\/user\/[^/]+$/, body: fixture("legacy/admin-detail") });
+	}
+	if (opts.portconf) {
+		routes.push({ path: `${LEGACY_ROOT}/s/default/rest/portconf`, body: fixture("legacy/portconf") });
+		routes.push({ path: `/api/s/default/rest/portconf`, body: fixture("legacy/portconf") });
+	}
+	if (opts.devices) {
+		// stat/device serves both the inventory and the stat read (one row per
+		// device carrying both shapes — the real controller's single response).
+		routes.push({ path: `${LEGACY_ROOT}/s/default/stat/device`, body: fixture("legacy/devices") });
+		routes.push({ path: `/api/s/default/stat/device`, body: fixture("legacy/devices") });
+		routes.push({ path: /\/stat\/device\/[^/]+$/, body: fixture("legacy/device-detail") });
 	}
 
 	const usesV2StaticDns = opts.sysinfo !== "sysinfo-7.3";
@@ -176,3 +371,20 @@ export function mockFetch(routes) {
 }
 
 export { CONTROLLER, OFFICIAL_ROOT, SITE_ID, LEGACY_ROOT };
+
+// The fixture resource ids ride along for the area tests (defined in mock-fetch).
+export {
+	DEVICE_ID,
+	CLIENT_DETAIL_ID,
+	WLAN_ID,
+	POLICY_ID,
+	ZONE_ID,
+	ACL_ID,
+	MATCHING_ID,
+	VOUCHER_ID,
+	LAG_ID,
+	STACK_ID,
+	MCLAG_ID,
+	VPN_SERVER_ID,
+	TUNNEL_ID
+} from "./mock-fetch.mjs";

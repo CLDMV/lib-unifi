@@ -1,0 +1,19 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. v2/api/site/{site}/user/{id} answers the single row (inside the envelope or bare).",
+	"meta": {
+		"rc": "ok"
+	},
+	"data": [
+		{
+			"_id": "m1a2b3c4d5e6f7a8b9c0d1e2",
+			"name": "admin",
+			"email": "admin@example.com",
+			"role": "admin",
+			"isSuper": false,
+			"isOwner": false,
+			"disabled": false,
+			"site_role": "admin",
+			"permissions": []
+		}
+	]
+}

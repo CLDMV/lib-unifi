@@ -1,0 +1,6 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. The DELETE answer.",
+	"meta": {
+		"rc": "ok"
+	}
+}

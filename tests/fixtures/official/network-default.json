@@ -12,7 +12,7 @@
 		"autoScaleEnabled": false,
 		"dhcpConfiguration": {
 			"mode": "SERVER",
-			"domainName": "homelab.cldmv.net",
+			"domainName": "homelab.example.com",
 			"leaseTimeSeconds": 86400,
 			"dhcpEnabled": true,
 			"dnsServerIpAddressesOverride": []

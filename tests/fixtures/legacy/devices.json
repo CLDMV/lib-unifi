@@ -1,0 +1,41 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. unifi-cli's device_list row (api/s/{site}/stat/device). The rows carry the stat fields too (cpu, mem, uptime, last_uplink) \u2014 stat/device answers one row per device carrying both the inventory and the stat read.",
+	"meta": {
+		"rc": "ok"
+	},
+	"data": [
+		{
+			"_id": "b1a2b3c4d5e6f7a8b9c0d1e2",
+			"mac": "00:00:5e:00:53:0a",
+			"ip": "192.0.2.11",
+			"model": "U7-Pro",
+			"name": "AP Office",
+			"version": "7.0.68",
+			"state": 1,
+			"type": "uap",
+			"adopted": true,
+			"uptime": 864000,
+			"cpu": 8.5,
+			"mem": 42.1,
+			"last_uplink": {
+				"uplink_mac": "00:00:5e:00:53:0c",
+				"uplink_device_name": "Gateway",
+				"uplink_remote_port": 9
+			},
+			"tx_bytes-r": 1200000,
+			"rx_bytes-r": 3400000
+		},
+		{
+			"_id": "c2b3c4d5e6f7a8b9c0d1e2",
+			"mac": "00:00:5e:00:53:0b",
+			"ip": "192.0.2.12",
+			"model": "USW-Pro-Max-24-PoE",
+			"name": "Switch Core",
+			"version": "7.0.50",
+			"state": 1,
+			"type": "usw",
+			"adopted": true,
+			"uptime": 900000
+		}
+	]
+}

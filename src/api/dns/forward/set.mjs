@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:10-08:00 (1795866250)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:03-08:00 (1795870563)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -71,7 +71,9 @@ export default async function set(forward, options = {}) {
 		const siteId = caps.site ?? (await resolveOfficialSiteId());
 		const collectionPath = `/sites/${encodeURIComponent(siteId)}/dns/policies`;
 		const body = officialForwardPolicyBody({ domain, target, enabled: forward.enabled });
-		const existing = (await self.dns.forward.list()).find((rule) => rule.domain === domain && rule.enabled);
+		// Any policy for the domain counts — replacing a DISABLED rule must not
+		// leave the disabled one behind and POST a duplicate.
+		const existing = (await self.dns.forward.list()).find((rule) => rule.domain === domain);
 		const method = existing ? "PUT" : "POST";
 		const path = existing ? `${collectionPath}/${encodeURIComponent(existing.id)}` : collectionPath;
 		if (options.dryRun) {

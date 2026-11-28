@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:13-08:00 (1795866253)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -31,7 +31,7 @@ describe("networks.list", () => {
 				cidr: "192.0.2.1/24",
 				gateway: "192.0.2.1",
 				dhcp: { range: null, leaseSec: 86400 },
-				dns: { servers: [], domain: "homelab.cldmv.net" },
+				dns: { servers: [], domain: "homelab.example.com" },
 				kind: "gateway"
 			},
 			{
@@ -41,7 +41,7 @@ describe("networks.list", () => {
 				cidr: "198.51.100.1/24",
 				gateway: "198.51.100.1",
 				dhcp: { range: null, leaseSec: 3600 },
-				dns: { servers: ["192.0.2.53", "192.0.2.54"], domain: "iot.cldmv.net" },
+				dns: { servers: ["192.0.2.53", "192.0.2.54"], domain: "iot.example.com" },
 				kind: "gateway"
 			}
 		]);
@@ -63,10 +63,10 @@ describe("networks.list", () => {
 			cidr: "192.0.2.1/24",
 			gateway: "192.0.2.1",
 			dhcp: { range: ["192.0.2.100", "192.0.2.199"], leaseSec: 86400 },
-			dns: { servers: ["192.0.2.166", "192.0.2.1"], domain: "homelab.cldmv.net" },
+			dns: { servers: ["192.0.2.166", "192.0.2.1"], domain: "homelab.example.com" },
 			kind: "corporate"
 		});
-		expect(networks[1].dns).toEqual({ servers: [], domain: "iot.cldmv.net" });
+		expect(networks[1].dns).toEqual({ servers: [], domain: "iot.example.com" });
 		expect(networks[1].vlan).toBe(20);
 		await unifi.slothlet.shutdown();
 	});
@@ -101,7 +101,7 @@ describe("networks.update", () => {
 				autoScaleEnabled: false,
 				dhcpConfiguration: {
 					mode: "SERVER",
-					domainName: "homelab.cldmv.net",
+					domainName: "homelab.example.com",
 					leaseTimeSeconds: 86400,
 					dhcpEnabled: true,
 					dnsServerIpAddressesOverride: ["192.0.2.166"]
@@ -118,20 +118,20 @@ describe("networks.update", () => {
 		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "doc-api-key" } });
 		const result = await unifi.networks.update("11111111-2222-4333-8444-555555555555", {
 			dns: ["192.0.2.166"],
-			domain: "Homelab.CLDmv.net."
+			domain: "Homelab.Example.com."
 		});
 		expect(result).toMatchObject({
 			ok: true,
 			capability: "official",
 			id: "11111111-2222-4333-8444-555555555555",
-			changed: { dns: ["192.0.2.166"], domain: "Homelab.CLDmv.net." }
+			changed: { dns: ["192.0.2.166"], domain: "Homelab.Example.com." }
 		});
 		const put = fetch.calls.find((call) => call.method === "PUT");
 		expect(put).toBeTruthy();
 		const body = JSON.parse(put.body);
 		expect(body.ipv4Configuration.dhcpConfiguration.dnsServerIpAddressesOverride).toEqual(["192.0.2.166"]);
 		// The controller's own normalization: trimmed, trailing dot stripped, lowercased.
-		expect(body.ipv4Configuration.dhcpConfiguration.domainName).toBe("homelab.cldmv.net");
+		expect(body.ipv4Configuration.dhcpConfiguration.domainName).toBe("homelab.example.com");
 		// Identity and metadata never ride the write body.
 		expect(body.id).toBeUndefined();
 		expect(body.metadata).toBeUndefined();
@@ -147,7 +147,7 @@ describe("networks.update", () => {
 		});
 		const plan = await unifi.networks.update(
 			"11111111222243338444555555555555",
-			{ dns: ["192.0.2.166"], domain: "homelab.cldmv.net" },
+			{ dns: ["192.0.2.166"], domain: "homelab.example.com" },
 			{ dryRun: true }
 		);
 		expect(plan.dryRun).toBe(true);
@@ -160,7 +160,7 @@ describe("networks.update", () => {
 			dhcpd_dns_2: "",
 			dhcpd_dns_3: "",
 			dhcpd_dns_4: "",
-			domain_name: "homelab.cldmv.net"
+			domain_name: "homelab.example.com"
 		});
 		expect(JSON.stringify(plan)).not.toContain("doc-password");
 		expect(JSON.stringify(plan)).not.toContain("Cookie");

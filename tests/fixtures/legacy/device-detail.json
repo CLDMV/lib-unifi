@@ -1,0 +1,36 @@
+{
+	"_source": "Hand-written from unifi-cli's tracked source (lib/api/map/map.mjs endpoint rows and the task/request shapes) and the UniFi documentation \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned. unifi-cli's device_detail row (api/s/{site}/stat/device/{id}).",
+	"meta": {
+		"rc": "ok"
+	},
+	"data": [
+		{
+			"_id": "b1a2b3c4d5e6f7a8b9c0d1e2",
+			"mac": "00:00:5e:00:53:0a",
+			"ip": "192.0.2.11",
+			"model": "U7-Pro",
+			"name": "AP Office",
+			"version": "7.0.68",
+			"state": 1,
+			"type": "uap",
+			"adopted": true,
+			"uptime": 864000,
+			"port_table": [
+				{
+					"port_idx": 1,
+					"speed": 1000,
+					"poe_enabled": true,
+					"poe_mode": "auto"
+				}
+			],
+			"radio_table": [
+				{
+					"name": "ra0",
+					"channel": 36,
+					"min_txpower": 3,
+					"max_txpower": 22
+				}
+			]
+		}
+	]
+}

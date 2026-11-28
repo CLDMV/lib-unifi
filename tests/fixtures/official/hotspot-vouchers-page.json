@@ -1,0 +1,24 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"id": "a2b3c4d5-e6f7-4a8b-9c0d-2e3f4a5b6c7d",
+			"code": 4861409510,
+			"name": "guest",
+			"timeLimitMinutes": 1440,
+			"rxRateLimitKbps": 1000,
+			"txRateLimitKbps": 1000,
+			"dataUsageLimitMBytes": 1024,
+			"authorizedGuestLimit": 1,
+			"authorizedGuestCount": 0,
+			"expired": false,
+			"createdAt": "2026-11-20T00:00:00Z",
+			"activatedAt": null,
+			"expiresAt": null
+		}
+	]
+}

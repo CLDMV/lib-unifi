@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -19,6 +19,7 @@ import { buildUrlWithParams, ensureHttpsUrl, joinSiteUrl, resolveUrl } from "../
 import { netmaskToPrefix, officialNetworkUpdateBody, legacyNetworkUpdateBody } from "../src/lib/normalize/network.mjs";
 import { isIpv4, normalizeMac, resolveClientId } from "../src/lib/normalize/client.mjs";
 import { isDomainName, isIpLiteral, officialPolicyFromRow, legacyStaticDnsFromRow } from "../src/lib/normalize/dns-record.mjs";
+import { size } from "../src/lib/util.mjs";
 
 describe("endpoint table", () => {
 	test("substitutes {site} and {id} and leaves unknown slots in place", () => {
@@ -42,8 +43,37 @@ describe("endpoint table", () => {
 			client_list: "api/s/{site}/stat/sta",
 			client_update: "api/s/{site}/rest/user/{id}",
 			network_config: "api/s/{site}/rest/networkconf",
-			site_info: "api/s/{site}/stat/sysinfo"
+			port_config: "api/s/{site}/rest/portconf",
+			radius_list: "api/s/{site}/rest/account",
+			admin_list: "api/s/{site}/rest/admin"
 		});
+		// sysinfo belongs to the unifi_os_v1 table, not legacy (the plan's note).
+		expect(endpoints.network.legacy).not.toHaveProperty("site_info");
+		expect(endpoints.network.unifi_os_v1.site_info).toBe("api/s/{site}/stat/sysinfo");
+	});
+
+	test("the RADIUS and admin rows carry all three versions as written", () => {
+		expect(endpoints.network.unifi_os_v2).toMatchObject({
+			radius_list: "v2/api/site/{site}/radius/users",
+			radius_add: "v2/api/site/{site}/radius/users/batch_add",
+			radius_update: "v2/api/site/{site}/radius/users/batch_update",
+			radius_delete: "v2/api/site/{site}/radius/users/{id}",
+			admin_list: "v2/api/site/{site}/user",
+			admin_detail: "v2/api/site/{site}/user/{id}"
+		});
+		expect(endpoints.network.unifi_os_v1).toMatchObject({
+			radius_list: "api/s/{site}/rest/radiususer",
+			radius_add: "api/s/{site}/rest/radiususer",
+			radius_update: "api/s/{site}/rest/radiususer/{id}",
+			radius_delete: "api/s/{site}/rest/radiususer/{id}"
+		});
+	});
+
+	test("the util helpers port unifi-cli's size()", () => {
+		expect(size("hello")).toBe(5);
+		expect(size([1, 2, 3])).toBe(3);
+		expect(size(new Map([["a", 1]]))).toBe(1);
+		expect(size({ a: 1, b: 2 })).toBe(2);
 	});
 });
 
@@ -135,13 +165,13 @@ describe("normalizers", () => {
 	});
 
 	test("the legacy update body maps dns onto dhcpd_dns_1..4 and normalizes the domain", () => {
-		expect(legacyNetworkUpdateBody({ dns: ["192.0.2.166", "192.0.2.1"], domain: "Homelab.CLDmv.net." })).toEqual({
+		expect(legacyNetworkUpdateBody({ dns: ["192.0.2.166", "192.0.2.1"], domain: "Homelab.Example.com." })).toEqual({
 			dhcpd_dns_enabled: true,
 			dhcpd_dns_1: "192.0.2.166",
 			dhcpd_dns_2: "192.0.2.1",
 			dhcpd_dns_3: "",
 			dhcpd_dns_4: "",
-			domain_name: "homelab.cldmv.net"
+			domain_name: "homelab.example.com"
 		});
 		expect(legacyNetworkUpdateBody({ dns: [] })).toEqual({
 			dhcpd_dns_enabled: false,
@@ -158,8 +188,8 @@ describe("normalizers", () => {
 				id: "p1",
 				type: "MX_RECORD",
 				enabled: true,
-				domain: "cldmv.net",
-				mailServerDomain: "mail.cldmv.net",
+				domain: "example.com",
+				mailServerDomain: "mail.example.com",
 				priority: 10,
 				metadata: { origin: "USER_DEFINED" }
 			})
@@ -167,9 +197,9 @@ describe("normalizers", () => {
 			id: "p1",
 			type: "MX_RECORD",
 			enabled: true,
-			domain: "cldmv.net",
+			domain: "example.com",
 			ttl: null,
-			data: { mailServerDomain: "mail.cldmv.net", priority: 10 },
+			data: { mailServerDomain: "mail.example.com", priority: 10 },
 			origin: "USER_DEFINED"
 		});
 		expect(legacyStaticDnsFromRow({ _id: "s1", enabled: true, key: "a.b.test", record_type: "A", value: "192.0.2.5" })).toMatchObject({
@@ -181,13 +211,13 @@ describe("normalizers", () => {
 	});
 
 	test("domain and IP-literal validation", () => {
-		expect(isDomainName("homelab.cldmv.net")).toBe(true);
+		expect(isDomainName("homelab.example.com")).toBe(true);
 		expect(isDomainName("1.0.10.in-addr.arpa")).toBe(true);
-		expect(isDomainName("https://homelab.cldmv.net")).toBe(false);
+		expect(isDomainName("https://homelab.example.com")).toBe(false);
 		expect(isDomainName("no-slashes-or-spaces allowed")).toBe(false);
 		expect(isIpLiteral("192.0.2.166")).toBe(true);
 		expect(isIpLiteral("100.64.178.0")).toBe(true);
 		expect(isIpLiteral("2001:db8::1")).toBe(true);
-		expect(isIpLiteral("homelab.cldmv.net")).toBe(false);
+		expect(isIpLiteral("homelab.example.com")).toBe(false);
 	});
 });

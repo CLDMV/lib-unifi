@@ -1,0 +1,11 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"id": "a1b2c3d4-1111-4222-8333-444455556666",
+	"name": "printer",
+	"type": "WIRED",
+	"ipAddress": "192.0.2.50",
+	"connectedAt": "2026-11-27T00:00:00Z",
+	"access": {
+		"type": "DEFAULT"
+	}
+}

@@ -6,15 +6,15 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:13-08:00 (1795866253)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
  */
 
 import { describe, expect, test } from "vitest";
-import { normalizeConfig } from "../src/lib/config.mjs";
+import { normalizeConfig, normalizeCredentials } from "../src/lib/config.mjs";
 import { buildUrlWithParams, joinSiteUrl, resolveUrl } from "../src/lib/url.mjs";
 import {
 	isDomainName,
@@ -32,17 +32,7 @@ import {
 	officialClientFromRow
 } from "../src/lib/normalize/client.mjs";
 import { legacyNetworkFromRow, netmaskToPrefix, officialNetworkFromDetail } from "../src/lib/normalize/network.mjs";
-import {
-	clearAllSites,
-	clearSite,
-	clearProbeCache,
-	getProbeCache,
-	getSite,
-	recentErrors,
-	recordError,
-	setProbeCache,
-	setSite
-} from "../src/lib/session.mjs";
+import { clearProbeCache, getProbeCache, recentErrors, recordError, setProbeCache } from "../src/lib/session.mjs";
 
 describe("config normalization", () => {
 	const base = { baseUrl: "https://192.0.2.1", fetch: () => {} };
@@ -57,22 +47,23 @@ describe("config normalization", () => {
 		expect(() => normalizeConfig({ ...base, baseUrl: "https://[" })).toThrow();
 	});
 
-	test("credentials are trimmed; blanks become null; site defaults", () => {
-		const config = normalizeConfig({
-			...base,
-			site: " lab ",
+	test("credentials normalize to the sealed shape: trimmed, blanks nulled, never on the settings", () => {
+		const config = normalizeConfig({ ...base, site: " lab " });
+		expect(config.site).toBe("lab");
+		// The settings object carries no credential value at all — the sealed
+		// shape lives in the auth closures (src/lib/auth-client.mjs).
+		expect(config).not.toHaveProperty("credentials");
+		const sealed = normalizeCredentials({
 			credentials: { apiKey: " key ", legacy: { username: " u ", password: "" } }
 		});
-		expect(config.site).toBe("lab");
-		expect(config.credentials.apiKey).toBe("key");
-		expect(config.credentials.legacy.username).toBe("u");
-		expect(config.credentials.legacy.password).toBe("");
+		expect(sealed.apiKey).toBe("key");
+		expect(sealed.legacy.username).toBe("u");
+		expect(sealed.legacy.password).toBe("");
 	});
 
-	test("the empty-credentials case composes and tls pins ride through", () => {
+	test("the empty-credentials case composes and the tls pin COUNT rides through", () => {
 		const config = normalizeConfig({ ...base, tls: { spkiPins: ["pin"] } });
-		expect(config.credentials.apiKey).toBe(null);
-		expect(config.tls.spkiPins).toEqual(["pin"]);
+		expect(config.tls.spkiPins).toBe(1);
 	});
 
 	test("timeouts and the official base have documented defaults and accept overrides", () => {
@@ -92,18 +83,6 @@ describe("config normalization", () => {
 });
 
 describe("session state", () => {
-	test("setSite deep-merges and clearSite forgets", () => {
-		clearAllSites();
-		setSite("default", { cookies: "a=1", api: { prefix: "/p/" } });
-		setSite("default", { api: { endpointVersion: "unifi_os_v2" } });
-		expect(getSite("default")).toMatchObject({ cookies: "a=1", api: { prefix: "/p/", endpointVersion: "unifi_os_v2" } });
-		// Unknown sites get the default shape.
-		expect(getSite("other")).toMatchObject({ cookies: null, loggedIn: false });
-		clearSite("default");
-		expect(getSite("default").cookies).toBe(null);
-		clearAllSites();
-	});
-
 	test("the error log is bounded and copy-safe", () => {
 		const before = recentErrors().length;
 		for (let index = 0; index < 60; index++) recordError({ kind: "http", status: index });
@@ -157,21 +136,21 @@ describe("dns record normalization", () => {
 				id: "srv",
 				type: "SRV_RECORD",
 				enabled: true,
-				domain: "cldmv.net",
+				domain: "example.com",
 				service: "_sip",
 				protocol: "_tcp",
-				serverDomain: "sip.cldmv.net",
+				serverDomain: "sip.example.com",
 				port: 5060,
 				priority: 1,
 				weight: 2
 			},
-			{ id: "txt", type: "TXT_RECORD", enabled: true, domain: "cldmv.net", text: "hello" }
+			{ id: "txt", type: "TXT_RECORD", enabled: true, domain: "example.com", text: "hello" }
 		];
 		const [aaaa, srv, txt] = rows.map((row) => officialPolicyFromRow(row));
 		expect(aaaa).toMatchObject({ type: "AAAA_RECORD", data: { ipv6Address: "2001:db8::1" }, ttl: 60 });
 		expect(srv).toMatchObject({
 			type: "SRV_RECORD",
-			data: { service: "_sip", protocol: "_tcp", serverDomain: "sip.cldmv.net", port: 5060, priority: 1, weight: 2 }
+			data: { service: "_sip", protocol: "_tcp", serverDomain: "sip.example.com", port: 5060, priority: 1, weight: 2 }
 		});
 		expect(txt).toMatchObject({ type: "TXT_RECORD", data: { text: "hello" }, ttl: null });
 	});

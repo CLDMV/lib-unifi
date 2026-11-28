@@ -1,0 +1,7 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"orderedFirewallPolicyIds": {
+		"beforeSystemDefined": [],
+		"afterSystemDefined": ["f5e6f7a8-b9c0-4d1e-2f3a-5e6f7a8b9c0d"]
+	}
+}

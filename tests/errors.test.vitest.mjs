@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:12-08:00 (1795866252)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:56:08-08:00 (1795870568)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -100,8 +100,8 @@ describe("official transport errors", () => {
 	});
 
 	test("a 400 with the duplicate-policy code surfaces as ApiError with the controller code", async () => {
+		// The 400 route must sit BEFORE the fixture routes so it wins the match.
 		const routes = [
-			...officialRoutes(),
 			{
 				method: "POST",
 				path: `${OFFICIAL_ROOT}/sites/${SITE_ID}/dns/policies`,
@@ -112,10 +112,11 @@ describe("official transport errors", () => {
 					code: "api.dns.policy.validation.record-already-exists",
 					message: "Record already exists"
 				}
-			}
+			},
+			...officialRoutes()
 		];
 		await withInstance({ baseUrl: CONTROLLER, fetch: mockFetch(routes), credentials: { apiKey: "k" } }, async (unifi) => {
-			await expect(unifi.dns.forward.set({ domain: "new.cldmv.net", target: "192.0.2.53" })).rejects.toMatchObject({
+			await expect(unifi.dns.forward.set({ domain: "new.example.com", target: "192.0.2.53" })).rejects.toMatchObject({
 				code: "API_ERROR",
 				status: 400,
 				controllerCode: "api.dns.policy.validation.record-already-exists"

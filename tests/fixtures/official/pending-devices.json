@@ -1,0 +1,20 @@
+{
+	"_source": "Hand-written from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) \u2014 documentation addresses (RFC 5737) and MACs (RFC 7042) only; ids are patterned documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 1,
+	"totalCount": 1,
+	"data": [
+		{
+			"macAddress": "00:00:5e:00:53:aa",
+			"model": "U7-Pro",
+			"ipAddress": "192.0.2.150",
+			"state": "PENDING_ADOPTION",
+			"supported": true,
+			"firmwareUpdatable": true,
+			"firmwareVersion": "7.0.68",
+			"features": ["accessPoint"],
+			"adoptionTargetSiteIds": ["d1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c"]
+		}
+	]
+}
