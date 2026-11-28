@@ -119,6 +119,63 @@ describe("capabilities probe", () => {
 		await unifi.slothlet.shutdown();
 	});
 
+	test("legacy: the sites fallback classifies unifi_os_v2 when sysinfo is unreadable", async () => {
+		const fetch = mockFetch(legacyRoutes({ sysinfo: null }));
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.endpointVersion).toBe("unifi_os_v2");
+		// The sites row carries no version, so the forward claim is refused.
+		expect(caps.dns).toMatchObject({ records: "legacy", forward: "none" });
+		await unifi.slothlet.shutdown();
+	});
+
+	test("legacy: the Protect bootstrap answers on an NVR, not a Network controller", async () => {
+		const fetch = mockFetch(legacyRoutes({ sysinfo: null, sites: false, bootstrap: true }));
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.endpointVersion).toBe("unifi_os_v2");
+		await unifi.slothlet.shutdown();
+	});
+
+	test("legacy: nothing answers the detection chain — the legacy fallback still reads networkconf", async () => {
+		const fetch = mockFetch(legacyRoutes({ sysinfo: null, sites: false, bootstrap: false }));
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.endpointVersion).toBe("legacy");
+		expect(caps.version).toBe(null);
+		expect(caps.networks).toBe("legacy");
+		expect(caps.dns.forward).toBe("none");
+		await unifi.slothlet.shutdown();
+	});
+
+	test("official /info answers but the sites list fails — the legacy path takes over", async () => {
+		const fetch = mockFetch([
+			...officialRoutes({ sites: false, networks: false, clients: false, policies: false }),
+			...legacyRoutes({ udmProbe: false })
+		]);
+		const unifi = await createUnifi({
+			baseUrl: CONTROLLER,
+			fetch,
+			credentials: { apiKey: "doc-api-key", legacy: { username: "digby", password: "doc-password" } }
+		});
+		const caps = await unifi.capabilities();
+		expect(caps.networks).toBe("legacy");
+		expect(caps.dns.forward).toBe("legacy");
+		await unifi.slothlet.shutdown();
+	});
+
 	test("the probe result is cached; refresh probes again", async () => {
 		const fetch = mockFetch(legacyRoutes());
 		const unifi = await createUnifi({

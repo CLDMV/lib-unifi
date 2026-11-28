@@ -52,7 +52,8 @@ export default defineConfig(
 				// stripped from their coverage keys (see coverage-provider.mjs).
 				customProviderModule: path.resolve(root, ".configs/coverage-provider.mjs"),
 				include: ["src/**"],
-				exclude: ["**/*.json"],
+				// The CJS shim is a require(esm) trampoline exercised by `test:cjs`, not the vitest suite.
+				exclude: ["**/*.json", "src/index.cjs"],
 				reporter: ["text", "html", "json-summary", "json"]
 			}
 		}
