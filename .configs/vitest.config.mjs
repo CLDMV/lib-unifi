@@ -6,8 +6,8 @@
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
- *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:44:08-08:00 (1795866248)
+ *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+ *	@Last modified time: 2026-11-28T04:55:59-08:00 (1795870559)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
@@ -25,7 +25,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Tests import the package by name (`@cldmv/lib-unifi`); the `lib-unifi-dev`
 // condition resolves that to `src/` in a checkout and to `dist/` without it.
-const condition = devCondition({ root: new URL("..", import.meta.url) });
+// `npm run test:dist` (LIB_UNIFI_TEST_DIST=1) drops the condition so the
+// suite exercises the BUILT package instead.
+const distMode = process.env.LIB_UNIFI_TEST_DIST === "1";
+const condition = distMode ? {} : devCondition({ root: new URL("..", import.meta.url) });
 
 export default defineConfig(
 	mergeConfig(condition, {

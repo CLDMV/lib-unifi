@@ -6,7 +6,7 @@
 #	@Email: <Shinrai@users.noreply.github.com>
 #	-----
 #	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
-#	@Last modified time: 2026-11-28T03:44:09-08:00 (1795866249)
+#	@Last modified time: 2026-11-28T04:56:00-08:00 (1795870560)
 #	-----
 #	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
 #
@@ -278,7 +278,10 @@ jobs:
             lint_fix_command: ${{ github.event.inputs.lint_fix_command || 'npm run lint:fix --if-present' }}
             lint_command: ${{ github.event.inputs.lint_command || 'npm run lint --if-present' }}
             format_check_command: ${{ github.event.inputs.format_check_command || 'npm run format:check --if-present' }}
-            build_command: "npm run build:ci"
+            # build:ci = lint + format:check + the per-module build; test:cjs then
+            # composes the BUILT package (dist/) so a missing or misplaced file
+            # under dist/api/ fails here, in CI, not only at publish time.
+            build_command: "npm run build:ci && npm run test:cjs"
             # Optional build cache around every build step (matrix legs, type check, coverage) (expensive output such as
             # a compiled wasm module or a downloaded toolchain). The paths must be
             # gitignored. No paths = no cache. See docs/conventions/build-cache.md.
@@ -310,8 +313,9 @@ jobs:
             # `types:check` is the fleet script name (tsc --noEmit on the source); see
             # docs/conventions/package-layout.md. Repos with nothing to type-check set
             # skip_type_check: true and say why.
-            type_check_command: ${{ github.event.inputs.type_check_command || 'npm run types:check' }}
-            skip_type_check: ${{ github.event.inputs.skip_type_check == 'true' }}
+            # No type check: this package is plain .mjs (no TypeScript source, no
+            # types/ output), so there is nothing for tsc --noEmit to check.
+            skip_type_check: true
 
             # ── PR coverage badge ─────────────────────────────────────────────────
             # Injects a Shields.io badge + breakdown table directly into the PR body

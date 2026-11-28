@@ -6,7 +6,7 @@
 #	@Email: <Shinrai@users.noreply.github.com>
 #	-----
 #	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
-#	@Last modified time: 2026-11-28T03:44:09-08:00 (1795866249)
+#	@Last modified time: 2026-11-28T04:55:59-08:00 (1795870559)
 #	-----
 #	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
 #
@@ -59,7 +59,7 @@ jobs:
         uses: CLDMV/.github/.github/workflows/reusable-bundle-size.yml@v4
         with:
             build_command: "npm run build" # CUSTOMIZE: the repo's real build
-            dist_paths: "dist/**" # CUSTOMIZE: the published files (see above)
+            dist_paths: "dist/**/*.mjs,dist/**/*.cjs" # CUSTOMIZE: the published files (see above)
             # Optional build cache around every build step (HEAD and BASE builds) (expensive output such as
             # a compiled wasm module or a downloaded toolchain). The paths must be
             # gitignored. No paths = no cache. See docs/conventions/build-cache.md.
