@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 /**
  *
- *	@Project: unifi-cli
- *	@Filename: /.githooks/install.mjs
+ *	@Project: @cldmv/lib-unifi
+ *	@Filename: .githooks/install.mjs
  *	@Date: 2026-10-05T01:06:37-07:00 (1791187597)
  *	@Author: Nate Corcoran <CLDMV>
  *	@Email: <Shinrai@users.noreply.github.com>
  *	-----
  *	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
- *	@Last modified time: 2026-10-05T01:06:37-07:00 (1791187597)
+ *	@Last modified time: 2026-11-28T03:44:08-08:00 (1795866248)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *

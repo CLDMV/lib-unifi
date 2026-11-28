@@ -1,10 +1,14 @@
 #
-# @Project: @cldmv/.github
-# @Filename: /examples/individual-repo-workflows/core-cicd/ci.yml
-# @Date: 2026-05-20 00:00:00 -07:00 (1779606000)
-# @Author: Nate Corcoran <CLDMV>
-# @Email: <Shinrai@users.noreply.github.com>
-# @Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
+#	@Project: @cldmv/lib-unifi
+#	@Filename: .github/workflows/ci.yml
+#	@Date: 2026-05-20T00:00:00-07:00 (1779260400)
+#	@Author: Nate Corcoran <CLDMV>
+#	@Email: <Shinrai@users.noreply.github.com>
+#	-----
+#	@Last modified by: Nate Corcoran <CLDMV> (Shinrai@users.noreply.github.com)
+#	@Last modified time: 2026-11-28T03:44:09-08:00 (1795866249)
+#	-----
+#	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
 #
 
 # Individual repo: .github/workflows/ci.yml

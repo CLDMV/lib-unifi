@@ -1,12 +1,13 @@
 /**
+ *
  *	@Project: @cldmv/lib-unifi
- *	@Filename: /src/index.mjs
- *	@Date: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	@Filename: src/index.mjs
+ *	@Date: 2026-11-28T03:07:00-07:00 (1795860420)
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
  *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	@Last modified time: 2026-11-28T03:44:11-08:00 (1795866251)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *

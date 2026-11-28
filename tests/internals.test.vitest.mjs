@@ -1,12 +1,13 @@
 /**
+ *
  *	@Project: @cldmv/lib-unifi
- *	@Filename: /tests/internals.test.vitest.mjs
- *	@Date: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	@Filename: tests/internals.test.vitest.mjs
+ *	@Date: 2026-11-28T03:07:00-07:00 (1795860420)
  *	@Author: Shinrai <CLDMV>
  *	@Email: <git+npm@cldmv.net>
  *	-----
  *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
- *	@Last modified time: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	@Last modified time: 2026-11-28T03:44:13-08:00 (1795866253)
  *	-----
  *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
  *
