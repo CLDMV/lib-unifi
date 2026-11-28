@@ -152,11 +152,13 @@ async function probeLegacy(siteKey) {
 		}
 	}
 
-	// 3. The Protect bootstrap -> a Protect NVR, not a Network controller.
+	// 3. The Protect bootstrap -> a Protect NVR, not a Network controller. The
+	// NVR object lives under .nvr (not under data[0]), per unifi-cli's
+	// tryProtectBootstrap pick.
 	if (version === null) {
 		const bootstrap = await legacyCheck(siteData, `${base}/api/bootstrap`);
-		if (bootstrap?.data) {
-			version = bootstrap.data.version ?? null;
+		if (bootstrap?.body?.nvr) {
+			version = bootstrap.body.nvr.version ?? null;
 			deviceType = "nvr";
 			endpointVersion = "unifi_os_v2";
 		}
