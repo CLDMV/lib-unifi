@@ -84,7 +84,7 @@ export function normalizeConfig(raw = {}) {
 		credentials: {
 			apiKey: typeof raw.credentials?.apiKey === "string" && raw.credentials.apiKey.trim() !== "" ? raw.credentials.apiKey.trim() : null,
 			legacy: {
-				username: typeof legacy.username === "string" && legacy.username.trim() !== "" ? legacy.username : null,
+				username: typeof legacy.username === "string" && legacy.username.trim() !== "" ? legacy.username.trim() : null,
 				password: typeof legacy.password === "string" ? legacy.password : null
 			}
 		},

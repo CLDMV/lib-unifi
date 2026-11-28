@@ -52,9 +52,11 @@ export function isIpv4(ip) {
  * @returns {object|null}
  */
 export function legacyClientFromStaRow(row) {
-	if (!row || typeof row !== "object" || !row.mac) return null;
+	if (!row || typeof row !== "object") return null;
+	const mac = normalizeMac(row.mac);
+	if (!mac) return null;
 	return {
-		mac: normalizeMac(row.mac),
+		mac,
 		ip: row.ip ?? null,
 		hostname: row.hostname ?? row.name ?? null,
 		network: row.network ?? row.last_connection_network_name ?? null,
@@ -70,9 +72,11 @@ export function legacyClientFromStaRow(row) {
  * @returns {object|null}
  */
 export function legacyClientRecordFromUserRow(row) {
-	if (!row || typeof row !== "object" || !row.mac) return null;
+	if (!row || typeof row !== "object") return null;
+	const mac = normalizeMac(row.mac);
+	if (!mac) return null;
 	return {
-		mac: normalizeMac(row.mac),
+		mac,
 		ip: row.fixed_ip ?? row.last_ip ?? null,
 		hostname: row.name ?? row.hostname ?? null,
 		network: row.last_connection_network_name ?? null,

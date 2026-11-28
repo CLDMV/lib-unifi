@@ -117,8 +117,14 @@ export function legacyRoutes(options = {}) {
 		routes.push({ path: `/api/s/default/stat/sysinfo`, body: fixture(`legacy/${opts.sysinfo}`) });
 	}
 
-	routes.push({ path: `${LEGACY_ROOT}/stat/sites`, body: fixture("legacy/sites") });
-	routes.push({ path: `/api/stat/sites`, body: fixture("legacy/sites") });
+	if (opts.sites) {
+		routes.push({ path: `${LEGACY_ROOT}/stat/sites`, body: fixture("legacy/sites") });
+		routes.push({ path: `/api/stat/sites`, body: fixture("legacy/sites") });
+	}
+	if (opts.bootstrap) {
+		routes.push({ path: `${LEGACY_ROOT}/api/bootstrap`, body: fixture("legacy/bootstrap") });
+		routes.push({ path: `/api/bootstrap`, body: fixture("legacy/bootstrap") });
+	}
 
 	// The UDM/NVR probes answer with the "Cannot GET /api" body (unifi-cli's checkEndpoint).
 	if (opts.udmProbe) routes.push({ path: "/proxy/network/api", body: "Cannot GET /api" });

@@ -125,7 +125,8 @@ describe("session state", () => {
 
 describe("url building edge cases", () => {
 	test("buildUrlWithParams falls back to manual encoding for URLs URL() cannot parse", () => {
-		const bad = "https://192.0.2.1/api?x=%zz";
+		// A space in the host is something URL() refuses; the manual fallback still appends.
+		const bad = "https://exa mple.test/api";
 		expect(buildUrlWithParams(bad, { a: "b" })).toBe(bad + "&a=b");
 	});
 
