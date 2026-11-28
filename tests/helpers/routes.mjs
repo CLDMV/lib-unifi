@@ -122,7 +122,7 @@ export function legacyRoutes(options = {}) {
 		routes.push({ path: `/api/stat/sites`, body: fixture("legacy/sites") });
 	}
 	if (opts.bootstrap) {
-		routes.push({ path: `${LEGACY_ROOT}/api/bootstrap`, body: fixture("legacy/bootstrap") });
+		routes.push({ path: `${LEGACY_ROOT}/bootstrap`, body: fixture("legacy/bootstrap") });
 		routes.push({ path: `/api/bootstrap`, body: fixture("legacy/bootstrap") });
 	}
 
