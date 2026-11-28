@@ -13,7 +13,7 @@
  */
 
 import { context } from "@cldmv/slothlet/runtime";
-import { clearAllSites, clearProbeCache, getProbeCache, setProbeCache, setSite, getSite } from "./session.mjs";
+import { clearAllSites, getProbeCache, setProbeCache, setSite, getSite } from "./session.mjs";
 import { login } from "./auth/login.mjs";
 import { legacyRequest } from "./transport/request.mjs";
 import { officialInfo, officialRequest, resolveOfficialSiteId } from "./transport/official.mjs";

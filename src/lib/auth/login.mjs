@@ -68,16 +68,15 @@ export async function login(siteKey, options = {}) {
 	}
 
 	const key = siteKey || config.site;
-	const state = getSite(key);
 	const host = options.host || config.baseUrl;
 	const startedAt = Date.now();
+	let osError;
 
 	// --- Step 1: UniFi OS login on :443 ---
 	const host443 = /:\d+/.test(host) ? host.replace(/:\d+$/, ":443") : host;
 	// The legacy fallback port is explicit: unifi-cli's legacy controllers answer on :8443.
 	const host8443 = /:\d+/.test(host) ? host.replace(/:\d+$/, ":8443") : `${host.replace(/\/$/, "")}:8443`;
 	const osLoginUrl = `${host443}/api/auth/login`;
-	let osError = null;
 	try {
 		const res = await config.fetch(osLoginUrl, {
 			method: "POST",

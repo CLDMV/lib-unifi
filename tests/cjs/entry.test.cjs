@@ -23,7 +23,7 @@
  */
 
 const assert = require("node:assert");
-const { existsSync, statSync, readdirSync } = require("node:fs");
+const { existsSync, statSync } = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..", "..");
@@ -95,7 +95,7 @@ const fetch = async (url, init = {}) => {
 	});
 };
 
-(async () => {
+(async (init) => {
 	const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "doc-api-key" } });
 	assert.strictEqual(typeof unifi.networks.list, "function", "the composed api carries the leaves");
 	const caps = await unifi.capabilities();

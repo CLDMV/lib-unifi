@@ -68,7 +68,7 @@ export function normalizeConfig(raw = {}) {
 	}
 	baseUrl = baseUrl.replace(/\/+$/, "");
 
-	let origin = baseUrl;
+	let origin;
 	try {
 		origin = new URL(baseUrl).origin;
 	} catch {

@@ -44,7 +44,9 @@ import { normalizeConfig } from "./lib/config.mjs";
  *   credentials?: {
  *     apiKey?: string,
  *     legacy?: { username?: string, password?: string },
- *   },
+ *   } | (() => above | Promise<above>) | Promise<above>,
+ *   // The function/promise forms are resolved once at compose time and the
+ *   // instance holds plain values. Nothing is read from the environment.
  *   tls?: { spkiPins?: string[] },
  *   officialBase?: string,
  *   timeoutMs?: number,
@@ -76,7 +78,12 @@ import { normalizeConfig } from "./lib/config.mjs";
  * await unifi.clients.fixed.ip.set("00:00:5e:00:53:01", "192.0.2.10", { dryRun: true });
  */
 export async function createUnifi(config = {}) {
-	const settings = normalizeConfig(config);
+	// `credentials` may also arrive as a getter (sync or async) or a promise —
+	// resolved once here, at compose time, so the instance holds plain values.
+	let { credentials } = config ?? {};
+	if (typeof credentials === "function") credentials = await credentials();
+	if (credentials && typeof credentials.then === "function") credentials = await credentials;
+	const settings = normalizeConfig({ ...config, credentials });
 	return slothlet({
 		// A path string in node mode (the layout doc's shape: the api/ folder
 		// next to this entry, resolved the same from src/ and from dist/).

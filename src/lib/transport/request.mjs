@@ -41,7 +41,7 @@ async function parseBody(res) {
 	if (text.trim() === "") return null;
 	try {
 		return JSON.parse(text);
-	} catch (err) {
+	} catch {
 		throw new TransportError("TRANSPORT_BODY_UNPARSEABLE", `response body is not JSON: ${String(text).slice(0, 120)}`);
 	}
 }
