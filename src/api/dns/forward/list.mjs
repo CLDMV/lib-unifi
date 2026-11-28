@@ -13,7 +13,7 @@
  */
 
 import { self } from "@cldmv/slothlet/runtime";
-import { FORWARD_DOMAIN_TYPE, LEGACY_FORWARD_TYPE } from "../../../../lib/normalize/dns-record.mjs";
+import { FORWARD_DOMAIN_TYPE, LEGACY_FORWARD_TYPE } from "../../../lib/normalize/dns-record.mjs";
 
 /**
  * @fileoverview `dns.forward.list()` — the site's Forward Domain rules, the
