@@ -7,7 +7,7 @@ import { createUnifi } from "@cldmv/lib-unifi";
 const unifi = await createUnifi({
 	baseUrl: "https://10.0.0.1",
 	fetch, // the fetch the library uses; it never opens sockets itself
-	credentials: { apiKey, legacy: { username, password } },
+	credentials: { apiKey, legacy: { username, password } }, // plain values — or a getter/promise, resolved once at compose time
 	tls: { spkiPins } // carried for reporting; pinning is the injected fetch's business
 });
 await unifi.capabilities(); // { networks: "official"|"legacy", clients: …, fixedIp: …, dns: { records: …, forward: "official"|"legacy"|"none" }, version }
@@ -28,6 +28,8 @@ The **official Integration API** (`/proxy/network/integration/v1`, an API key cr
 `capabilities()` probes both and classifies each capability `official | legacy | none`. `dns.forward` is `official` when the official policies endpoint answers (Forward Domain is a policy type there), `legacy` when the legacy static-DNS collection answers **and** the Network application version is known to be 9 or later (Forward Domain needs 9.x), `none` otherwise. The fixed-IP write is a legacy-only capability. Neither credential is required at compose time — a dry-run-only caller may compose first; reads and sends fail with typed errors until one path has credentials.
 
 ## Errors
+
+Credentials never leak: they are never logged, never put in error messages or thrown objects (an auth failure's error names URLs, not values), never written to disk, and dry-run answers carry no credentials and no session headers. `credentials` may also arrive as a function (sync or async) or a promise — resolved once when the instance composes; nothing is ever read from the environment.
 
 Every failure is a typed error from `src/lib/errors.mjs` — `ConfigError` (factory config), `AuthError` (legacy login; both attempts reported), `ApiError` (a non-2xx answer; carries the controller's own code), `TransportError` (fetch failures, untrustworthy list pages), `CapabilityError` (the probed capability is unavailable, with a fix-step hint), `ValidationError` (a bad MAC, IP, domain or patch). `isUnifiError(err, code?)` is the type guard. The library never exits the process.
 
