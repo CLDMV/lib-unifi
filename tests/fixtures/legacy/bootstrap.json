@@ -1,0 +1,6 @@
+{
+	"_source": "GET api/bootstrap (the UniFi Protect bootstrap) per unifi-cli lib/api/util/controller.mjs tryProtectBootstrap: the NVR object lives under .nvr (not under data[0]); version from the nvr row. Hand-written.",
+	"meta": { "rc": "ok" },
+	"data": [],
+	"nvr": { "version": "4.1.22", "name": "nvr" }
+}

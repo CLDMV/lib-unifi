@@ -93,6 +93,8 @@ export function legacyLoginResponse() {
 export function legacyRoutes(options = {}) {
 	const opts = {
 		sysinfo: "sysinfo",
+		sites: true,
+		bootstrap: false,
 		login: "unifi_os",
 		staticDns: true,
 		networkconf: true,
