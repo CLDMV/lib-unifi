@@ -73,7 +73,7 @@ assert.strictEqual(typeof createUnifi, "function", "require(dist) must yield the
 const CONTROLLER = "https://192.0.2.1";
 let called = 0;
 /** A tiny fetch stub: the official surface, one route per path. */
-const fetch = async (url, init = {}) => {
+const fetch = async (url, _init = {}) => {
 	called += 1;
 	const parsed = new URL(String(url));
 	const json = (body) => new Response(JSON.stringify(body), { status: 200, headers: { "Content-Type": "application/json" } });
@@ -95,7 +95,7 @@ const fetch = async (url, init = {}) => {
 	});
 };
 
-(async (init) => {
+(async () => {
 	const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { apiKey: "doc-api-key" } });
 	assert.strictEqual(typeof unifi.networks.list, "function", "the composed api carries the leaves");
 	const caps = await unifi.capabilities();

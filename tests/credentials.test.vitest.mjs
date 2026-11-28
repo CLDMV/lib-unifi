@@ -15,7 +15,7 @@
 import { describe, expect, test } from "vitest";
 import { inspect } from "node:util";
 import { createUnifi } from "@cldmv/lib-unifi";
-import { officialRoutes, legacyRoutes, mockFetch, CONTROLLER } from "./helpers/routes.mjs";
+import { legacyRoutes, mockFetch, CONTROLLER } from "./helpers/routes.mjs";
 
 const SECRET = "doc-password-s3cret";
 const LEGACY_CREDS = { legacy: { username: "digby-operator", password: SECRET } };
