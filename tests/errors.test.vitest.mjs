@@ -186,11 +186,28 @@ describe("official transport errors", () => {
 });
 
 describe("legacy transport errors", () => {
-	test("a non-2xx legacy answer is an ApiError carrying meta.msg", async () => {
-		const fetch = mockFetch([
+	// The probe's client_list read is the first sta call (succeeds, so the
+	// capability classifies legacy); the leaf's own read is the second, and it
+	// is the one that must carry the transport error to the caller.
+	const staSecondCallRoutes = (failingRoute) => {
+		let staCalls = 0;
+		return [
 			...LEGACY_WITH_LOGIN,
-			{ path: /\/stat\/sta$/, status: 403, body: { meta: { rc: "error", msg: "api.err.NoPermission" } } }
-		]);
+			{
+				...failingRoute,
+				match: () => {
+					staCalls += 1;
+					return staCalls > 1;
+				}
+			},
+			{ path: /\/stat\/sta$/, body: { meta: { rc: "ok" }, data: [] } }
+		];
+	};
+
+	test("a non-2xx legacy answer is an ApiError carrying meta.msg", async () => {
+		const fetch = mockFetch(
+			staSecondCallRoutes({ path: /\/stat\/sta$/, status: 403, body: { meta: { rc: "error", msg: "api.err.NoPermission" } } })
+		);
 		await withInstance(
 			{ baseUrl: CONTROLLER, fetch, credentials: { legacy: { username: "digby", password: "doc-password" } } },
 			async (unifi) => {
@@ -204,7 +221,7 @@ describe("legacy transport errors", () => {
 	});
 
 	test("an unparseable body is a TransportError", async () => {
-		const fetch = mockFetch([...LEGACY_WITH_LOGIN, { path: /\/stat\/sta$/, body: "<html>not json</html>" }]);
+		const fetch = mockFetch(staSecondCallRoutes({ path: /\/stat\/sta$/, body: "<html>not json</html>" }));
 		await withInstance(
 			{ baseUrl: CONTROLLER, fetch, credentials: { legacy: { username: "digby", password: "doc-password" } } },
 			async (unifi) => {

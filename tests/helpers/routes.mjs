@@ -54,6 +54,15 @@ export function officialRoutes(enabled = {}) {
 	}
 	if (on.clients) routes.push({ method: "GET", path: `${sitePath}/clients`, body: fixture("official/clients-page") });
 	if (on.policies) routes.push({ method: "GET", path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page") });
+	// The update PUTs echo the stored object.
+	if (on.networks)
+		routes.push({ method: "PUT", path: new RegExp(`${sitePath}/networks/[^/]+$`), body: fixture("official/network-default") });
+	if (on.policies)
+		routes.push({
+			method: "PUT",
+			path: new RegExp(`${sitePath}/dns/policies/[^/]+$`),
+			body: fixture("official/dns-policies-page").data[1]
+		});
 	return routes;
 }
 
