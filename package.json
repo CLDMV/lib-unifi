@@ -50,32 +50,34 @@
 		"controller",
 		"slothlet"
 	],
-	"main": "./src/index.cjs",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
 	"exports": {
 		".": {
 			"lib-unifi-dev": {
 				"import": "./src/index.mjs",
 				"require": "./src/index.cjs"
 			},
-			"default": {
-				"import": "./dist/index.mjs",
-				"require": "./dist/index.cjs"
-			}
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist/",
+		"!dist/**/*.map",
 		"LICENSE",
 		"README.md"
 	],
 	"scripts": {
 		"prepare": "node -e \"import('./.githooks/install.mjs').catch(()=>{})\"",
+		"prepack": "npm run build",
 		"build": "node scripts/build.mjs",
 		"build:ci": "npm run lint && npm run format:check && npm run build",
 		"test": "node tests/run-vitest.mjs",
 		"test:watch": "vitest --config .configs/vitest.config.mjs",
 		"test:cjs": "node tests/cjs/entry.test.cjs",
+		"test:dist": "LIB_UNIFI_TEST_DIST=1 node tests/run-vitest.mjs",
 		"coverage": "node tests/run-vitest.mjs --coverage-quiet",
 		"ci:coverage": "npm run coverage",
 		"lint": "eslint --config .configs/eslint.config.mjs .",
@@ -85,7 +87,7 @@
 		"fix:headers": "fix-headers --config .configs/fix-headers.json"
 	},
 	"dependencies": {
-		"@cldmv/slothlet": "^3.24.0"
+		"@cldmv/slothlet": ">=3.22.1 <3.24.0"
 	},
 	"devDependencies": {
 		"@cldmv/configs": "^1.5.0",
