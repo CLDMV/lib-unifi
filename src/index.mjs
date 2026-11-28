@@ -13,6 +13,7 @@
  */
 
 import slothlet from "@cldmv/slothlet";
+import { fileURLToPath } from "node:url";
 import { normalizeConfig } from "./lib/config.mjs";
 
 /**
@@ -77,7 +78,9 @@ import { normalizeConfig } from "./lib/config.mjs";
 export async function createUnifi(config = {}) {
 	const settings = normalizeConfig(config);
 	return slothlet({
-		base: new URL("./api/", import.meta.url),
+		// A path string in node mode (the layout doc's shape: the api/ folder
+		// next to this entry, resolved the same from src/ and from dist/).
+		base: fileURLToPath(new URL("./api/", import.meta.url)),
 		mode: "eager",
 		context: { unifi: settings }
 	});
