@@ -102,5 +102,5 @@ export default async function set(forward, options = {}) {
 	// The transport already threw on a non-2xx status, so only an explicit
 	// `meta.rc` error in the envelope marks the write failed.
 	const ok = response?.meta?.rc ? response.meta.rc === "ok" : true;
-	return { ok, capability: "legacy", domain, target, id: response?._id ?? existing?._id ?? null, created: !existing, response };
+	return { ok, capability: "legacy", domain, target, id: existing?._id ?? response?._id ?? null, created: !existing, response };
 }

@@ -30,7 +30,7 @@ describe("endpoint table", () => {
 		// unifi_os_v1 carries the pre-v2 static-DNS surface (the rest collection).
 		expect(resolveEndpoint("network", "unifi_os_v1", "static_dns_list", { site: "default" })).toBe("api/s/default/rest/static-dns");
 		// The fallback still applies: site_info is absent from unifi_os_v2 and found in unifi_os_v1.
-		expect(resolveEndpoint("network", "unifi_os_v2", "site_info", { site: "default" })).toBe("api/s/{site}/stat/sysinfo");
+		expect(resolveEndpoint("network", "unifi_os_v2", "site_info", { site: "default" })).toBe("api/s/default/stat/sysinfo");
 		expect(() => resolveEndpoint("network", "legacy", "no_such_key", {})).toThrow(/no_such_key/);
 	});
 

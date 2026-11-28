@@ -48,7 +48,7 @@ describe("legacy login", () => {
 		expect(fallback).toBeTruthy();
 		expect(fallback.headers.Referer).toBe(`${CONTROLLER}:8443/login`);
 		// The legacy session rides subsequent calls.
-		const read = fetch.calls.find((call) => call.pathname === "/proxy/network/api/s/default/rest/networkconf");
+		const read = fetch.calls.find((call) => call.pathname === "/api/s/default/rest/networkconf");
 		expect(read.headers.Cookie).toBe("unifises=doc-legacy-cookie");
 		await unifi.slothlet.shutdown();
 	});

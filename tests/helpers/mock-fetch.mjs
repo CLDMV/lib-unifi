@@ -79,7 +79,10 @@ export function createMockFetch(routes) {
 			if (route.match && !route.match({ url: parsed, init, method })) continue;
 			const headers = new Headers(route.headers ?? {});
 			for (const cookie of route.setCookie ?? []) headers.append("set-cookie", cookie);
-			const raw = route.body === undefined ? "" : typeof route.body === "string" ? route.body : JSON.stringify(route.body);
+			// `_source` is fixture provenance for the reader, not controller data.
+			const body = route.body !== null && typeof route.body === "object" && !Array.isArray(route.body) ? { ...route.body } : route.body;
+			if (body && typeof body === "object" && !Array.isArray(body)) delete body._source;
+			const raw = body === undefined ? "" : typeof body === "string" ? body : JSON.stringify(body);
 			return new Response(raw, { status: route.status ?? 200, headers });
 		}
 		return new Response(

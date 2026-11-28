@@ -1,0 +1,8 @@
+{
+	"_source": "PUT v2/api/site/{site}/static-dns/{id} response: the stored row with the same _id it was written under (sirkirby/unifi-mcp dns_manager.py; row id is the documentation fixture's existing forward row). Hand-written.",
+	"_id": "s1a2b3c4d5e64f7a8b9c0d1e2f3a4b5c",
+	"enabled": true,
+	"key": "homelab.cldmv.net",
+	"record_type": "forward",
+	"value": "192.0.2.53"
+}

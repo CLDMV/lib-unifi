@@ -124,8 +124,16 @@ describe("official transport errors", () => {
 
 	test("officialList refuses listings it cannot trust (drift, repeats, incomplete pages)", async () => {
 		const driftFetch = mockFetch([
-			{ path: `${OFFICIAL_ROOT}/x`, body: { offset: 0, limit: 200, count: 1, totalCount: 2, data: [{ id: "a" }] } },
-			{ path: `${OFFICIAL_ROOT}/x`, body: { offset: 1, limit: 200, count: 2, totalCount: 3, data: [{ id: "b" }, { id: "c" }] } }
+			{
+				path: `${OFFICIAL_ROOT}/x`,
+				match: ({ url }) => url.searchParams.get("offset") === "0",
+				body: { offset: 0, limit: 200, count: 1, totalCount: 2, data: [{ id: "a" }] }
+			},
+			{
+				path: `${OFFICIAL_ROOT}/x`,
+				match: ({ url }) => url.searchParams.get("offset") === "1",
+				body: { offset: 1, limit: 200, count: 2, totalCount: 3, data: [{ id: "b" }, { id: "c" }] }
+			}
 		]);
 		await withInstance({ baseUrl: CONTROLLER, fetch: driftFetch, credentials: { apiKey: "k" } }, async (unifi) => {
 			await unifi.slothlet.context.run({}, async () => {

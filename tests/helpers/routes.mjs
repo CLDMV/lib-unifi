@@ -142,8 +142,8 @@ export function legacyRoutes(options = {}) {
 	if (opts.staticDnsWrite) {
 		routes.push({ method: "POST", path: bareStaticDns, body: fixture("legacy/static-dns-created") });
 		routes.push({ method: "POST", path: proxiedStaticDns, body: fixture("legacy/static-dns-created") });
-		routes.push({ method: "PUT", path: new RegExp(`${bareStaticDns}/[^/]+$`), body: fixture("legacy/static-dns-created") });
-		routes.push({ method: "PUT", path: new RegExp(`${proxiedStaticDns}/[^/]+$`), body: fixture("legacy/static-dns-created") });
+		routes.push({ method: "PUT", path: new RegExp(`${bareStaticDns}/[^/]+$`), body: fixture("legacy/static-dns-updated") });
+		routes.push({ method: "PUT", path: new RegExp(`${proxiedStaticDns}/[^/]+$`), body: fixture("legacy/static-dns-updated") });
 	}
 	return routes;
 }
