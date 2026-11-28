@@ -55,6 +55,9 @@ await build({
 	outbase: src,
 	bundle: false,
 	format: "esm",
+	// Keep the .mjs extension — dist/ must mirror src/ file for file (the
+	// layout doc's shape; the CJS shim requires ./index.mjs by name).
+	outExtension: { ".js": ".mjs" },
 	minify: true,
 	keepNames: true,
 	platform: "node",
