@@ -1,0 +1,29 @@
+{
+	"_source": "GET /integration/v1/sites/{siteId}/clients page per the Integration API reference (getconnectedclientoverviewpage): client rows carry id, macAddress, ipAddress, hostname, name, networkId. Hand-written; MACs are documentation addresses.",
+	"offset": 0,
+	"limit": 200,
+	"count": 2,
+	"totalCount": 2,
+	"data": [
+		{
+			"id": "c1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+			"macAddress": "00:00:5e:00:53:01",
+			"ipAddress": "192.0.2.10",
+			"hostname": "printer",
+			"name": "printer",
+			"networkId": "11111111-2222-4333-8444-555555555555",
+			"isWired": true,
+			"online": true
+		},
+		{
+			"id": "c2b3c4d5-e6f7-4a8b-9c0d-1e2f3a4b5c6d",
+			"macAddress": "00:00:5e:00:53:02",
+			"ipAddress": "198.51.100.21",
+			"hostname": null,
+			"name": "thermostat",
+			"networkId": "66666666-7777-4888-8999-000000000000",
+			"isWired": false,
+			"online": true
+		}
+	]
+}

@@ -1,0 +1,117 @@
+/**
+ *	@Project: @cldmv/lib-unifi
+ *	@Filename: /tests/auth.test.vitest.mjs
+ *	@Date: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	@Author: Shinrai <CLDMV>
+ *	@Email: <git+npm@cldmv.net>
+ *	-----
+ *	@Last modified by: Shinrai <CLDMV> (git+npm@cldmv.net)
+ *	@Last modified time: 2026-11-28T03:07:00-07:00 (1764329220)
+ *	-----
+ *	@Copyright: Copyright (c) 2013-2026 Catalyzed Motivation Inc. All rights reserved.
+ *
+ */
+
+import { describe, expect, test } from "vitest";
+import { createUnifi } from "@cldmv/lib-unifi";
+import { legacyRoutes, mockFetch, CONTROLLER } from "./helpers/routes.mjs";
+
+const LEGACY_CREDS = { legacy: { username: "digby", password: "doc-password" } };
+
+describe("legacy login", () => {
+	test("UniFi OS login captures the session cookie and the CSRF token", async () => {
+		const fetch = mockFetch(legacyRoutes());
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
+		const clients = await unifi.clients.list();
+		expect(clients.length).toBeGreaterThan(0);
+		const login = fetch.calls.find((call) => call.pathname === "/api/auth/login");
+		expect(login).toBeTruthy();
+		expect(login.method).toBe("POST");
+		expect(JSON.parse(login.body)).toEqual({ username: "digby", password: "doc-password" });
+		const read = fetch.calls.find((call) => call.pathname === "/proxy/network/api/s/default/stat/sta");
+		expect(read.headers.Cookie).toBe("TOKEN=doc-token-cookie");
+		expect(read.headers["X-Csrf-Token"]).toBe("doc-csrf-token-0001");
+		await unifi.slothlet.shutdown();
+	});
+
+	test("falls back to the legacy :8443 login when the UniFi OS attempt fails", async () => {
+		const routes = [
+			{ method: "POST", path: "/api/auth/login", status: 401, body: { meta: { rc: "error", msg: "api.err.Invalid" } } },
+			{ method: "POST", path: "/api/login", status: 200, setCookie: ["unifises=doc-legacy-cookie; Path=/"], body: "" },
+			...legacyRoutes({ login: "none" })
+		];
+		const fetch = mockFetch(routes);
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
+		const caps = await unifi.capabilities();
+		expect(caps.networks).toBe("legacy");
+		const fallback = fetch.calls.find((call) => call.pathname === "/api/login");
+		expect(fallback).toBeTruthy();
+		expect(fallback.headers.Referer).toBe(`${CONTROLLER}:8443/login`);
+		// The legacy session rides subsequent calls.
+		const read = fetch.calls.find((call) => call.pathname === "/proxy/network/api/s/default/rest/networkconf");
+		expect(read.headers.Cookie).toBe("unifises=doc-legacy-cookie");
+		await unifi.slothlet.shutdown();
+	});
+
+	test("a login without the unifises cookie is not a legacy session", async () => {
+		const routes = [
+			{ method: "POST", path: "/api/auth/login", status: 401, body: { meta: { rc: "error", msg: "api.err.Invalid" } } },
+			{ method: "POST", path: "/api/login", status: 200, setCookie: ["other=cookie; Path=/"], body: "" },
+			...legacyRoutes({ login: "none" })
+		];
+		const fetch = mockFetch(routes);
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
+		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "AUTH_LOGIN_FAILED" });
+		expect(fetch.calls.filter((call) => call.pathname === "/api/login")).toHaveLength(1);
+		await unifi.slothlet.shutdown();
+	});
+
+	test("both attempts failing is AUTH_LOGIN_FAILED with both attempts in the error", async () => {
+		const fetch = mockFetch(legacyRoutes({ login: "none" }));
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
+		await expect(unifi.clients.list()).rejects.toSatisfy((err) => {
+			expect(err.code).toBe("AUTH_LOGIN_FAILED");
+			expect(err.attempts).toHaveLength(2);
+			return true;
+		});
+		await unifi.slothlet.shutdown();
+	});
+
+	test("no legacy credentials: AUTH_NO_CREDENTIALS", async () => {
+		const fetch = mockFetch([]);
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { legacy: { username: "digby" } } });
+		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "AUTH_NO_CREDENTIALS" });
+		await unifi.slothlet.shutdown();
+	});
+
+	test("a 401 mid-session clears the session and re-logs in once", async () => {
+		let staCalls = 0;
+		// The capability probe's client_list read is the first sta call (succeeds);
+		// clients.list's read is the second (401 -> re-login -> retry succeeds).
+		const fetch = mockFetch([
+			{
+				method: "POST",
+				path: "/api/auth/login",
+				...legacyRoutes().find((route) => route.method === "POST" && route.path === "/api/auth/login")
+			},
+			...legacyRoutes({ login: "none", sta: false }),
+			{
+				path: /\/stat\/sta$/,
+				match: () => {
+					staCalls += 1;
+					return staCalls === 2;
+				},
+				status: 401,
+				body: { meta: { rc: "error", msg: "api.err.LoginRequired" } }
+			},
+			{ path: /\/stat\/sta$/, body: { meta: { rc: "ok" }, data: [] } }
+		]);
+		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
+		const clients = await unifi.clients.list();
+		expect(clients).toEqual([]);
+		// Two logins: the probe's, plus the re-login after the 401.
+		expect(fetch.calls.filter((call) => call.pathname === "/api/auth/login")).toHaveLength(2);
+		expect(staCalls).toBe(3);
+		await unifi.slothlet.shutdown();
+	});
+});

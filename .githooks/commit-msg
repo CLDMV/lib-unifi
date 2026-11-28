@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# Repo-local commit-msg gate — ENFORCED ON THE `dev` BRANCH ONLY.
+#
+# Chained by the global core.hooksPath dispatcher AFTER its own policy (no
+# Co-authored-by), so this composes with global policy instead of replacing it.
+# Installed into .git/hooks/commit-msg by .githooks/install.mjs.
+#
+#   1. Require a Conventional-Commit subject prefix from the allowed set.
+#   2. Reject breaking-change markers — a `!` in the type (feat!:) and a
+#      `BREAKING CHANGE:` / `BREAKING-CHANGE:` footer. Markers only: ordinary
+#      prose containing the word "breaking" is fine.
+#
+# No-op on every other branch (feature/release branches version + gate elsewhere).
+
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+[ "$branch" = "dev" ] || exit 0
+
+msg_file="$1"
+# The subject = first non-blank, non-comment line.
+subject=$(grep -vE '^[[:space:]]*#' "$msg_file" | grep -vE '^[[:space:]]*$' | head -1)
+
+types='feat|fix|chore|docs|ci|refactor|perf|test|style|build|revert|deps'
+
+# 1. Conventional-Commit prefix (optional scope).
+if ! printf '%s' "$subject" | grep -qE "^(${types})(\([^)]+\))?!?: .+"; then
+	echo >&2 "✗ commit rejected on dev: subject needs a Conventional-Commit prefix."
+	echo >&2 "  Allowed types: ${types}"
+	echo >&2 "  e.g.  \"feat(view): add X\"   \"fix: correct Y\"   \"chore(deps): bump Z\""
+	echo >&2 "  Got:  ${subject}"
+	exit 1
+fi
+
+# 2. Deny breaking-change markers.
+if printf '%s' "$subject" | grep -qE "^(${types})(\([^)]+\))?!:"; then
+	echo >&2 "✗ commit rejected on dev: the breaking-change marker '!' is not allowed."
+	echo >&2 "  Breaking changes do not land on dev. Drop the '!' (e.g. \"feat:\" not \"feat!:\")."
+	exit 1
+fi
+if grep -qE '^[[:space:]]*BREAKING[ -]CHANGE:' "$msg_file"; then
+	echo >&2 "✗ commit rejected on dev: a 'BREAKING CHANGE:' footer is not allowed."
+	echo >&2 "  Breaking changes do not land on dev."
+	exit 1
+fi
+
+exit 0

@@ -1,0 +1,10 @@
+{
+	"_source": "The Integration API error body shape, as probed live and documented in sentania-labs/vcf-content-factory knowledge/context/api-maps/unifi-network-api.md (Integration API probe section): { statusCode, statusName, code, message, timestamp, requestPath, requestId }. Values here are the documentation example, with the requestId replaced.",
+	"statusCode": 401,
+	"statusName": "UNAUTHORIZED",
+	"code": "api.authentication.missing-credentials",
+	"message": "Missing Credentials",
+	"timestamp": "2026-11-28T00:00:00.000000000Z",
+	"requestPath": "/integration/v1/info",
+	"requestId": "00000000-0000-4000-8000-000000000000"
+}

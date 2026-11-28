@@ -1,0 +1,15 @@
+{
+	"_source": "GET api/s/{site}/stat/sysinfo for a pre-7.4 Network application: unifi-cli lib/api/util/controller.mjs classifies version < 7.4 as endpointVersion unifi_os_v1 (v2 static-dns paths do not exist yet). Hand-written.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"version": "7.3.0",
+			"build": "atag_7.3.0_00000",
+			"update_available": false,
+			"hostname": "ucg",
+			"name": "ucg",
+			"ubnt_device_type": "UCG",
+			"timezone": "Etc/UTC"
+		}
+	]
+}

@@ -1,0 +1,11 @@
+{
+	"_source": "GET /integration/v1/sites page envelope { offset, limit, count, totalCount, data } and the site object { id (UUID), internalReference, name } per the Integration API reference and dnsweaver client.go site struct. Hand-written; ids are documentation UUIDs.",
+	"offset": 0,
+	"limit": 200,
+	"count": 2,
+	"totalCount": 2,
+	"data": [
+		{ "id": "d1a2b3c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c", "internalReference": "default", "name": "Default" },
+		{ "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d", "internalReference": "lab", "name": "Lab" }
+	]
+}

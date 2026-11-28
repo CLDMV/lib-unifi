@@ -1,0 +1,4 @@
+{
+	"_source": "GET /proxy/network/integration/v1/info response shape from the UniFi Network Integration API reference (developer.ui.com, network v11.0.97) as implemented by independent clients (dnsweaver providers/unifi/client.go applicationInfo; jknyght9/unifi-dns client.py applicationVersion). Hand-written; the version value is the release the reference documents, not a live controller.",
+	"applicationVersion": "10.5.67"
+}

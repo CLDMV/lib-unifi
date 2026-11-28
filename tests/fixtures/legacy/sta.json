@@ -1,0 +1,24 @@
+{
+	"_source": "GET api/s/{site}/stat/sta connected-client rows per unifi-cli lib/api/device/scan.mjs client_list and the legacy controller API: mac, ip, hostname, network, use_fixedip, fixed_ip, _id. Hand-written; MACs are documentation addresses.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"_id": "c1a2b3c4d5e64f7a8b9c0d1e2f3a4b5c",
+			"mac": "00:00:5e:00:53:01",
+			"ip": "192.0.2.10",
+			"hostname": "printer",
+			"network": "Default",
+			"use_fixedip": false,
+			"fixed_ip": null
+		},
+		{
+			"_id": "c2b3c4d5e6f74a8b9c0d1e2f3a4b5c6d",
+			"mac": "00:00:5e:00:53:02",
+			"ip": "198.51.100.21",
+			"hostname": "thermostat",
+			"network": "IoT",
+			"use_fixedip": true,
+			"fixed_ip": "198.51.100.21"
+		}
+	]
+}

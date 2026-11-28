@@ -1,0 +1,27 @@
+{
+	"_source": "GET v2/api/site/{site}/static-dns (UniFi OS) or api/s/{site}/rest/static-dns (older) rows: { _id, enabled, key, record_type, value } per sirkirby/unifi-mcp packages/unifi-core dns_manager.py (the endpoint set) and ThomasLomas/traefik-to-unifi app.py (the POST body { enabled, key, record_type, value }). Hand-written; the forward row is a Forward Domain rule, the domain/target pair a documentation example.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"_id": "s1a2b3c4d5e64f7a8b9c0d1e2f3a4b5c",
+			"enabled": true,
+			"key": "homelab.cldmv.net",
+			"record_type": "forward",
+			"value": "192.0.2.166"
+		},
+		{
+			"_id": "s2b3c4d5e6f74a8b9c0d1e2f3a4b5c6d",
+			"enabled": true,
+			"key": "printer.iot.cldmv.net",
+			"record_type": "A",
+			"value": "198.51.100.50"
+		},
+		{
+			"_id": "s3c4d5e6f7a84b9c8d0e2f3a4b5c6d7e",
+			"enabled": false,
+			"key": "stale.homelab.cldmv.net",
+			"record_type": "A",
+			"value": "192.0.2.99"
+		}
+	]
+}

@@ -1,0 +1,4 @@
+{
+	"_source": "PUT api/s/{site}/rest/networkconf/{id} response envelope ({ meta: { rc } }), same shape unifi-cli's request path normalizes. Hand-written.",
+	"meta": { "rc": "ok" }
+}

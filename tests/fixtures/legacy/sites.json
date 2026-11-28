@@ -1,0 +1,14 @@
+{
+	"_source": "GET api/stat/sites response per unifi-cli lib/api/util/controller.mjs (the sites detection fallback) and the sentania recon (api/self/sites section, same row shape): _id, name, desc, attr_hidden_id, device_count. Hand-written.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"_id": "5e5e5e5e5e5e5e5e5e5e5e5e",
+			"name": "default",
+			"desc": "Default",
+			"attr_hidden_id": "default",
+			"attr_no_delete": true,
+			"device_count": 3
+		}
+	]
+}

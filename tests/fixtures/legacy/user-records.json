@@ -1,0 +1,26 @@
+{
+	"_source": "GET api/s/{site}/rest/user client config records per unifi-cli lib/api/device/update.mjs (the client_update PUT target) and jknyght9/unifi-dns client.py (_users): _id, mac, name, hostname, use_fixedip, fixed_ip, local_dns_record, last_connection_network_name. Hand-written; MACs are documentation addresses.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"_id": "u1a2b3c4d5e64f7a8b9c0d1e2f3a4b5c",
+			"mac": "00:00:5e:00:53:01",
+			"name": "printer",
+			"hostname": "printer",
+			"use_fixedip": false,
+			"fixed_ip": null,
+			"local_dns_record": "printer",
+			"last_connection_network_name": "Default"
+		},
+		{
+			"_id": "u2b3c4d5e6f74a8b9c0d1e2f3a4b5c6d",
+			"mac": "00:00:5e:00:53:03",
+			"name": "server01",
+			"hostname": "server01",
+			"use_fixedip": true,
+			"fixed_ip": "192.0.2.166",
+			"local_dns_record": "server01",
+			"last_connection_network_name": "Default"
+		}
+	]
+}

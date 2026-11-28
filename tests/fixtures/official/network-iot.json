@@ -1,0 +1,22 @@
+{
+	"_source": "GET /integration/v1/sites/{siteId}/networks/{networkId} detail, second network; same shape as network-default.json. Hand-written.",
+	"id": "66666666-7777-4888-8999-000000000000",
+	"name": "IoT",
+	"vlanId": 20,
+	"enabled": true,
+	"management": "GATEWAY",
+	"dhcpGuarding": false,
+	"ipv4Configuration": {
+		"hostIpAddress": "198.51.100.1",
+		"prefixLength": 24,
+		"autoScaleEnabled": false,
+		"dhcpConfiguration": {
+			"mode": "SERVER",
+			"domainName": "iot.cldmv.net",
+			"leaseTimeSeconds": 3600,
+			"dhcpEnabled": true,
+			"dnsServerIpAddressesOverride": ["192.0.2.53", "192.0.2.54"]
+		}
+	},
+	"metadata": { "origin": "USER_DEFINED" }
+}

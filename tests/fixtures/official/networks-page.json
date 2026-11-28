@@ -1,0 +1,27 @@
+{
+	"_source": "GET /integration/v1/sites/{siteId}/networks overview page per the Integration API reference (getnetworksoverviewpage) and unpoller's IntegrationNetwork struct { dhcpGuarding, enabled, id, management, name, vlanId }. Hand-written.",
+	"offset": 0,
+	"limit": 200,
+	"count": 2,
+	"totalCount": 2,
+	"data": [
+		{
+			"id": "11111111-2222-4333-8444-555555555555",
+			"name": "Default",
+			"vlanId": 1,
+			"enabled": true,
+			"management": "GATEWAY",
+			"dhcpGuarding": false,
+			"metadata": { "origin": "USER_DEFINED" }
+		},
+		{
+			"id": "66666666-7777-4888-8999-000000000000",
+			"name": "IoT",
+			"vlanId": 20,
+			"enabled": true,
+			"management": "GATEWAY",
+			"dhcpGuarding": false,
+			"metadata": { "origin": "USER_DEFINED" }
+		}
+	]
+}

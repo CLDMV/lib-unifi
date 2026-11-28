@@ -1,0 +1,15 @@
+{
+	"_source": "GET api/s/{site}/stat/sysinfo response, envelope { meta: { rc: \"ok\" }, data: [ {...} ] }, fields version/build/hostname/name/ubnt_device_type/update_available as read by unifi-cli lib/api/util/controller.mjs detectEndpointType and documented in the sentania-labs recon (stat/sysinfo section). Hand-written; values are documentation examples.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"version": "9.3.43",
+			"build": "atag_9.3.43_00000",
+			"update_available": false,
+			"hostname": "udm",
+			"name": "udm",
+			"ubnt_device_type": "UDMPRO",
+			"timezone": "Etc/UTC"
+		}
+	]
+}

@@ -1,0 +1,51 @@
+{
+	"_source": "GET api/s/{site}/rest/networkconf rows per unifi-cli lib/api/map/map.mjs network_config and the legacy controller API field set read by jknyght9/unifi-dns client.py get_networks: dhcpd_dns_1..4, dhcpd_dns_enabled, domain_name, plus the standard networkconf fields (ipaddr, ipaddr_subnet, dhcpd_start/stop/leasetime/enabled, purpose, vlan, vlan_enabled). Hand-written; addresses are documentation ranges.",
+	"meta": { "rc": "ok" },
+	"data": [
+		{
+			"_id": "11111111222243338444555555555555",
+			"name": "Default",
+			"purpose": "corporate",
+			"ipaddr": "192.0.2.1",
+			"ipaddr_subnet": "255.255.255.0",
+			"vlan_enabled": false,
+			"vlan": 1,
+			"dhcpd_enabled": true,
+			"dhcpd_start": "192.0.2.100",
+			"dhcpd_stop": "192.0.2.199",
+			"dhcpd_leasetime": 86400,
+			"dhcpd_dns_enabled": true,
+			"dhcpd_dns_1": "192.0.2.166",
+			"dhcpd_dns_2": "192.0.2.1",
+			"dhcpd_dns_3": "",
+			"dhcpd_dns_4": "",
+			"domain_name": "homelab.cldmv.net"
+		},
+		{
+			"_id": "66666666777748888899000000000000",
+			"name": "IoT",
+			"purpose": "corporate",
+			"ipaddr": "198.51.100.1",
+			"ipaddr_subnet": "255.255.255.0",
+			"vlan_enabled": true,
+			"vlan": 20,
+			"dhcpd_enabled": true,
+			"dhcpd_start": "198.51.100.100",
+			"dhcpd_stop": "198.51.100.199",
+			"dhcpd_leasetime": 3600,
+			"dhcpd_dns_enabled": false,
+			"dhcpd_dns_1": "",
+			"dhcpd_dns_2": "",
+			"dhcpd_dns_3": "",
+			"dhcpd_dns_4": "",
+			"domain_name": "iot.cldmv.net"
+		},
+		{
+			"_id": "aaaaaaaaaaaa4bbbbbbbcccccccccccc",
+			"name": "WAN",
+			"purpose": "wan",
+			"ipaddr": "203.0.113.2",
+			"ipaddr_subnet": "255.255.255.248"
+		}
+	]
+}

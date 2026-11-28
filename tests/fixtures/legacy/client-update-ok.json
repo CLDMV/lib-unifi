@@ -1,0 +1,4 @@
+{
+	"_source": "PUT api/s/{site}/rest/user/{id} response envelope per unifi-cli lib/api/device/update.mjs (updateDevice normalizes { meta: { rc } }). Hand-written.",
+	"meta": { "rc": "ok" }
+}
