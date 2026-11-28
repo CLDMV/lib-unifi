@@ -33,6 +33,6 @@ import { runProbe } from "../lib/probe.mjs";
  * @param {{ refresh?: boolean }} [options]
  * @returns {Promise<object>} the capability report (see lib/probe.mjs for the rules)
  */
-export default async function capabilities(options = {}) {
+export async function capabilities(options = {}) {
 	return runProbe(options);
 }
