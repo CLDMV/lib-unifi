@@ -13,10 +13,10 @@
  */
 
 import { self } from "@cldmv/slothlet/runtime";
-import { CapabilityError } from "../../../lib/errors.mjs";
-import { officialList, resolveOfficialSiteId } from "../../../lib/transport/official.mjs";
-import { legacyRequest, envelopeData } from "../../../lib/transport/request.mjs";
-import { officialPolicyFromRow, legacyStaticDnsFromRow } from "../../../lib/normalize/dns-record.mjs";
+import { CapabilityError } from "../../../../lib/errors.mjs";
+import { officialList, resolveOfficialSiteId } from "../../../../lib/transport/official.mjs";
+import { legacyRequest, envelopeData } from "../../../../lib/transport/request.mjs";
+import { officialPolicyFromRow, legacyStaticDnsFromRow } from "../../../../lib/normalize/dns-record.mjs";
 
 /**
  * @fileoverview `dns.records.list()` — every local DNS record the site

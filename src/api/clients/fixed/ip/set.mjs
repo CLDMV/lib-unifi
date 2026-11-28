@@ -13,9 +13,9 @@
  */
 
 import { self } from "@cldmv/slothlet/runtime";
-import { ApiError, CapabilityError, ValidationError } from "../../../lib/errors.mjs";
-import { legacyRequest, legacyUrl, envelopeData } from "../../../lib/transport/request.mjs";
-import { resolveClientId, isIpv4, normalizeMac } from "../../../lib/normalize/client.mjs";
+import { ApiError, CapabilityError, ValidationError } from "../../../../lib/errors.mjs";
+import { legacyRequest, legacyUrl, envelopeData } from "../../../../lib/transport/request.mjs";
+import { resolveClientId, isIpv4, normalizeMac } from "../../../../lib/normalize/client.mjs";
 
 /**
  * @fileoverview `clients.fixed.ip.set(mac, ip, options)` — the normalised

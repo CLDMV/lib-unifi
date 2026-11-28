@@ -13,10 +13,10 @@
  */
 
 import { self } from "@cldmv/slothlet/runtime";
-import { CapabilityError, ValidationError } from "../../../lib/errors.mjs";
-import { officialRequest, officialUrl, resolveOfficialSiteId } from "../../../lib/transport/official.mjs";
-import { legacyRequest, legacyUrl, envelopeData } from "../../../lib/transport/request.mjs";
-import { officialForwardPolicyBody, legacyForwardBody, isDomainName, isIpLiteral } from "../../../lib/normalize/dns-record.mjs";
+import { CapabilityError, ValidationError } from "../../../../lib/errors.mjs";
+import { officialRequest, officialUrl, resolveOfficialSiteId } from "../../../../lib/transport/official.mjs";
+import { legacyRequest, legacyUrl, envelopeData } from "../../../../lib/transport/request.mjs";
+import { officialForwardPolicyBody, legacyForwardBody, isDomainName, isIpLiteral } from "../../../../lib/normalize/dns-record.mjs";
 
 /**
  * @fileoverview `dns.forward.set({ domain, target }, options)` — the
