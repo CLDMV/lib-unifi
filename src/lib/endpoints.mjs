@@ -46,7 +46,11 @@ export const endpoints = {
 			static_dns_delete: "v2/api/site/{site}/static-dns/{id}"
 		},
 		unifi_os_v1: {
-			site_info: "api/s/{site}/stat/sysinfo"
+			site_info: "api/s/{site}/stat/sysinfo",
+			static_dns_list: "api/s/{site}/rest/static-dns",
+			static_dns_create: "api/s/{site}/rest/static-dns",
+			static_dns_update: "api/s/{site}/rest/static-dns/{id}",
+			static_dns_delete: "api/s/{site}/rest/static-dns/{id}"
 		},
 		legacy: {
 			sites_list: "api/stat/sites",

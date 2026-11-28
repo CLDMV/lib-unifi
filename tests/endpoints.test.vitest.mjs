@@ -27,8 +27,10 @@ describe("endpoint table", () => {
 	});
 
 	test("falls back across versions, then across types, and throws when nothing carries the key", () => {
-		// static_dns_list is absent from unifi_os_v1; the legacy version carries it.
+		// unifi_os_v1 carries the pre-v2 static-DNS surface (the rest collection).
 		expect(resolveEndpoint("network", "unifi_os_v1", "static_dns_list", { site: "default" })).toBe("api/s/default/rest/static-dns");
+		// The fallback still applies: site_info is absent from unifi_os_v2 and found in unifi_os_v1.
+		expect(resolveEndpoint("network", "unifi_os_v2", "site_info", { site: "default" })).toBe("api/s/{site}/stat/sysinfo");
 		expect(() => resolveEndpoint("network", "legacy", "no_such_key", {})).toThrow(/no_such_key/);
 	});
 
@@ -70,7 +72,7 @@ describe("url building", () => {
 
 	test("appends query params, encoded", () => {
 		expect(buildUrlWithParams("https://192.0.2.1/api", { offset: 0, limit: 200, filter: "a b" })).toBe(
-			"https://192.0.2.1/api?offset=0&limit=200&filter=a%20b"
+			"https://192.0.2.1/api?offset=0&limit=200&filter=a+b"
 		);
 		expect(buildUrlWithParams("https://192.0.2.1/api", {})).toBe("https://192.0.2.1/api");
 	});

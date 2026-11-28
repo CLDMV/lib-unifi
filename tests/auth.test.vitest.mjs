@@ -61,26 +61,35 @@ describe("legacy login", () => {
 		];
 		const fetch = mockFetch(routes);
 		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
-		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "AUTH_LOGIN_FAILED" });
+		// The probe classifies; the auth failure rides the report.
+		const caps = await unifi.capabilities();
+		expect(caps.authError).toMatchObject({ code: "AUTH_LOGIN_FAILED" });
 		expect(fetch.calls.filter((call) => call.pathname === "/api/login")).toHaveLength(1);
+		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE" });
 		await unifi.slothlet.shutdown();
 	});
 
-	test("both attempts failing is AUTH_LOGIN_FAILED with both attempts in the error", async () => {
+	test("both attempts failing reports both attempts on the capability report", async () => {
 		const fetch = mockFetch(legacyRoutes({ login: "none" }));
 		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: LEGACY_CREDS });
-		await expect(unifi.clients.list()).rejects.toSatisfy((err) => {
-			expect(err.code).toBe("AUTH_LOGIN_FAILED");
-			expect(err.attempts).toHaveLength(2);
-			return true;
-		});
+		const caps = await unifi.capabilities();
+		expect(caps.authError).toMatchObject({ code: "AUTH_LOGIN_FAILED" });
+		expect(caps.authError.attempts).toHaveLength(2);
+		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "CAPABILITY_UNAVAILABLE" });
 		await unifi.slothlet.shutdown();
 	});
 
-	test("no legacy credentials: AUTH_NO_CREDENTIALS", async () => {
+	test("an incomplete legacy account (no password) probes to none and refuses the legacy-only write", async () => {
 		const fetch = mockFetch([]);
 		const unifi = await createUnifi({ baseUrl: CONTROLLER, fetch, credentials: { legacy: { username: "digby" } } });
-		await expect(unifi.clients.list()).rejects.toMatchObject({ code: "AUTH_NO_CREDENTIALS" });
+		const caps = await unifi.capabilities();
+		expect(caps.networks).toBe("none");
+		// The fixed-IP write is legacy-only; the official surface is not configured either.
+		await expect(unifi.clients.fixed.ip.set("00:00:5e:00:53:01", "192.0.2.10")).rejects.toMatchObject({
+			code: "CAPABILITY_UNAVAILABLE",
+			capability: "fixedIp"
+		});
+		expect(fetch.calls).toHaveLength(0);
 		await unifi.slothlet.shutdown();
 	});
 

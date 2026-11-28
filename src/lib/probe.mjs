@@ -113,8 +113,10 @@ async function legacyCheck(siteData, url) {
 async function probeLegacy(siteKey) {
 	try {
 		await login(siteKey);
-	} catch {
-		return null;
+	} catch (err) {
+		// The probe classifies; it does not raise. The failure reason rides the
+		// report so callers can tell a refused login from an unreachable one.
+		return { authError: { code: err?.code ?? "AUTH_LOGIN_FAILED", message: err?.message ?? String(err), attempts: err?.attempts ?? null } };
 	}
 
 	const siteData = getSiteData(siteKey);
@@ -227,7 +229,8 @@ export async function runProbe(options = {}) {
 		applicationVersion: null,
 		updateAvailable: null,
 		site: null,
-		endpointVersion: null
+		endpointVersion: null,
+		authError: null
 	};
 
 	if (config.credentials.apiKey) {
@@ -260,7 +263,10 @@ export async function runProbe(options = {}) {
 		// the login result is the only thing in the session.
 		clearAllSites();
 		const probed = await probeLegacy(siteKey);
-		if (probed) {
+		if (probed?.authError) {
+			result.authError = probed.authError;
+		}
+		if (probed && !probed.authError) {
 			result.endpointVersion = probed.endpointVersion;
 			if (result.networks === "none" && probed.legacy.networks) result.networks = "legacy";
 			if (result.clients === "none" && probed.legacy.clients) result.clients = "legacy";

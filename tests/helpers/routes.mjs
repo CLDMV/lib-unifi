@@ -37,15 +37,23 @@ const sitePath = `${OFFICIAL_ROOT}/sites/${SITE_ID}`;
 export function officialRoutes(enabled = {}) {
 	const on = { info: true, sites: true, networks: true, clients: true, policies: true, ...enabled };
 	const routes = [];
-	if (on.info) routes.push({ path: `${OFFICIAL_ROOT}/info`, body: fixture("official/info") });
-	if (on.sites) routes.push({ path: `${OFFICIAL_ROOT}/sites`, body: fixture("official/sites") });
+	if (on.info) routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/info`, body: fixture("official/info") });
+	if (on.sites) routes.push({ method: "GET", path: `${OFFICIAL_ROOT}/sites`, body: fixture("official/sites") });
 	if (on.networks) {
-		routes.push({ path: `${sitePath}/networks`, body: on.networksPage ?? fixture("official/networks-page") });
-		routes.push({ path: `${sitePath}/networks/11111111-2222-4333-8444-555555555555`, body: fixture("official/network-default") });
-		routes.push({ path: `${sitePath}/networks/66666666-7777-4888-8999-000000000000`, body: fixture("official/network-iot") });
+		routes.push({ method: "GET", path: `${sitePath}/networks`, body: on.networksPage ?? fixture("official/networks-page") });
+		routes.push({
+			method: "GET",
+			path: `${sitePath}/networks/11111111-2222-4333-8444-555555555555`,
+			body: fixture("official/network-default")
+		});
+		routes.push({
+			method: "GET",
+			path: `${sitePath}/networks/66666666-7777-4888-8999-000000000000`,
+			body: fixture("official/network-iot")
+		});
 	}
-	if (on.clients) routes.push({ path: `${sitePath}/clients`, body: fixture("official/clients-page") });
-	if (on.policies) routes.push({ path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page") });
+	if (on.clients) routes.push({ method: "GET", path: `${sitePath}/clients`, body: fixture("official/clients-page") });
+	if (on.policies) routes.push({ method: "GET", path: `${sitePath}/dns/policies`, body: fixture("official/dns-policies-page") });
 	return routes;
 }
 

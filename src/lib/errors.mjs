@@ -72,12 +72,31 @@ export class CapabilityError extends UnifiError {
 /** A caller passed something the library cannot build a request from. */
 export class ValidationError extends UnifiError {}
 
+/** The class names the type guard recognizes across instance boundaries. */
+const UNIFI_ERROR_NAMES = new Set([
+	"UnifiError",
+	"ConfigError",
+	"AuthError",
+	"ApiError",
+	"TransportError",
+	"CapabilityError",
+	"ValidationError"
+]);
+
 /**
- * Type guard. Optionally matches on the machine-readable code.
+ * Type guard. Optionally matches on the machine-readable code. instanceof
+ * alone is not enough — a caller (and a test) may hold an error across a
+ * slothlet instance boundary, where the class identity is a different module
+ * copy — so the name+code shape is the stable contract.
  * @param {unknown} err
  * @param {string} [code]
  * @returns {boolean}
  */
 export function isUnifiError(err, code) {
-	return err instanceof UnifiError && (code === undefined || err.code === code);
+	// instanceof alone is not enough: a caller (and a test) may hold the error
+	// across a slothlet instance boundary, where the class identity is a
+	// different module copy. The name+code shape is the stable contract.
+	const shaped = err instanceof Error && UNIFI_ERROR_NAMES.has(err.name) && typeof err.code === "string";
+	if (!shaped) return false;
+	return code === undefined || err.code === code;
 }

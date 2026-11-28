@@ -82,8 +82,10 @@ describe("official transport errors", () => {
 	});
 
 	test("officialPath escapes ids and refuses slashes and empties", () => {
-		expect(officialPath("sites", "a b/c")).toBe("/sites/a%20b%2Fc");
+		// Spaces are escaped; a slash in an id would change the endpoint and is refused.
+		expect(officialPath("sites", "a b")).toBe("/sites/a%20b");
 		expect(officialPath("sites", SITE_ID, "dns", "policies")).toBe(`/sites/${SITE_ID}/dns/policies`);
+		expect(() => officialPath("sites", "a/b")).toThrow();
 		expect(() => officialPath("sites", "")).toThrow();
 	});
 
