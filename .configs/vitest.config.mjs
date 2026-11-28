@@ -29,6 +29,10 @@ const condition = devCondition({ root: new URL("..", import.meta.url) });
 export default defineConfig(
 	mergeConfig(condition, {
 		root,
+		// Keep each leaf's relative `lib/` helpers per-instance under vitest
+		// (Node's own resolve hook never sees the imports vite resolves).
+		// Top-level `plugins` — inside `test` it is ignored.
+		plugins: [slothletInstanceImports()],
 		test: {
 			include: ["tests/**/*.test.vitest.mjs"],
 			exclude: ["node_modules"],
@@ -36,9 +40,6 @@ export default defineConfig(
 			// Inline slothlet so composed leaves are attributed in coverage
 			// (see slothlet docs/TESTING.md, "Fix 1: inline slothlet in your test config").
 			server: { deps: { inline: [/@cldmv\/slothlet/] } },
-			// Keep each leaf's relative `lib/` helpers per-instance under vitest
-			// (Node's own resolve hook never sees the imports vite resolves).
-			plugins: [slothletInstanceImports()],
 			testTimeout: 30000,
 			hookTimeout: 30000,
 			// "dot" keeps CI logs to one character per test file instead of a full
